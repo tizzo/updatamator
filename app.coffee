@@ -1,13 +1,38 @@
-var flatiron = require('flatiron'),
-    path = require('path'),
-    app = flatiron.app;
+flatiron = require 'flatiron'
+path = require 'path'
+app = flatiron.app
+Winston = require 'winston'
+IO = require 'socket.io'
 
-app.config.file({ file: path.join(__dirname, 'config', 'config.json') });
+app.config.file
+  file: path.join __dirname, 'config', 'config.json'
 
-app.use(flatiron.plugins.http);
+app.use flatiron.plugins.http
 
-app.router.get('/', function () {
-  this.res.json({ 'hello': 'world' })
-});
+Winston.loggers.add 'default',
+  console:
+    level: '',
+    colorize: 'true'
 
-app.start(3000);
+app.log = Winston.log
+
+require('./lib/routes').attach app
+
+
+if app.config.get('socketIOPort') == app.config.get('port')
+  io = IO.listen app.server
+else
+  app.log 'info', "Starting socket server on port #{app.config.get('socketIOPort')}."
+  options =
+    key: fs.readFileSync app.config.get('socketIOKey')
+    cert: fs.readFileSync app.config.get('socketIOCert')
+  handler = (req, res)->
+    res.writeHead 200, {'Content-Type': 'text/plain'}
+    res.end 'server running'
+  socketServer = require('https').createServer(options, handler)
+  IO.listen app.server
+  io = IO.listen(socketServer)
+  socketServer.listen(app.config.get('socketIOPort'))
+
+
+app.start app.config.get 'port'
