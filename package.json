@@ -4,11 +4,20 @@
   "private": true,
   "dependencies": {
     "union": "0.1.7",
-    "flatiron": "0.2.1"
+    "flatiron": "0.2.1",
+    "winston": "0.6.2",
+    "ecstatic": "0.1.6",
+    "plates": "0.4.6",
+    "redis": "0.7.2",
+    "socket.io": "0.9.10",
+    "coffee-script": "1.4.0",
+    "async": "0.1.22",
+    "uglify-js": "2.2.2"
   },
   "devDependencies": {
     "api-easy": "0.3.2",
-    "vows": "0.6.1"
+    "vows": "0.6.1",
+    "mocha": "1.7.4"
   },
   "scripts": {
     "test": "vows --spec",
