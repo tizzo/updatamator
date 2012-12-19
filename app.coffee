@@ -2,7 +2,9 @@ flatiron = require 'flatiron'
 path = require 'path'
 app = flatiron.app
 Winston = require 'winston'
-IO = require 'socket.io'
+fs = require 'fs'
+ecstatic = require 'ecstatic'
+plates = require 'plates'
 
 app.config.file
   file: path.join __dirname, 'config', 'config.json'
@@ -13,26 +15,57 @@ Winston.loggers.add 'default',
   console:
     level: '',
     colorize: 'true'
-
 app.log = Winston.log
 
 require('./lib/routes').attach app
 
 
-if app.config.get('socketIOPort') == app.config.get('port')
-  io = IO.listen app.server
-else
-  app.log 'info', "Starting socket server on port #{app.config.get('socketIOPort')}."
-  options =
-    key: fs.readFileSync app.config.get('socketIOKey')
-    cert: fs.readFileSync app.config.get('socketIOCert')
-  handler = (req, res)->
-    res.writeHead 200, {'Content-Type': 'text/plain'}
-    res.end 'server running'
-  socketServer = require('https').createServer(options, handler)
-  IO.listen app.server
-  io = IO.listen(socketServer)
-  socketServer.listen(app.config.get('socketIOPort'))
+# Load our templates
+app.templates = {}
+for name in fs.readdirSync __dirname + '/views/templates'
+  app.templates[name.substr(0, name.length - 5)] = fs.readFileSync(__dirname + "/views/templates/#{name}", 'utf8')
 
+# Set the app's dir for other modules to include
+app.dir = __dirname
+
+# Load our mappings
+app.mappings = require './views/mappings'
+
+app.renderTemplate = (name, data = {})->
+  return plates.bind app.templates[name], data, app.mappings[name]
+
+app.renderPage = ()->
+  return @renderTemplate 'index'
+
+app.sendResponse = (context, code, html, headers = {'Content-Type': 'text/html'})->
+  context.res.writeHead code, headers
+  context.res.end html
+
+# Serve css from our static directory
+app.http.before = [
+  ecstatic __dirname + '/css', { autoIndex: false}
+  (request, response)->
+    response.settings = {}
+]
+
+# Serve our client side javascript.
+app.router.get 'js/minified.js', ->
+  if not app.clientScripts
+    javascript = ''
+    javascripts = [
+      'clientLib/jquery-1.8.0.min'
+    ]
+    for name in javascripts
+      javascript += fs.readFileSync app.dir + "/#{name}.js", 'utf8'
+    coffeescripts = [
+      'lib/client'
+    ]
+    for name in coffeescripts
+      javascript += coffee.compile fs.readFileSync "#{app.dir}/#{name}.coffee", 'utf8'
+    app.clientScripts = javascript
+  app.sendResponse this, 200, app.clientScripts,
+    'Content-Type': 'application/javascript'
 
 app.start app.config.get 'port'
+app.log.log 'info', "Application listening on port #{app.config.get 'port'}"
+require('./lib/socket').attach app
