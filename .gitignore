@@ -2,3 +2,4 @@ node_modules
 test_results
 config/config.json
 *.sassc
+css/.sass-cache
