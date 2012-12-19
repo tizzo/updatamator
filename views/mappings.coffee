@@ -7,3 +7,6 @@ map = Plates.Map()
 map.where('class').is('project-option').use('title')
 map.where('class').is('project-option').use('id').as('value');
 mappings['option'] = map
+
+map = Plates.Map()
+mappings['index'] = map
