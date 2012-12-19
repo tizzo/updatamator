@@ -5,6 +5,7 @@ Winston = require 'winston'
 fs = require 'fs'
 ecstatic = require 'ecstatic'
 plates = require 'plates'
+redis = require 'redis'
 
 app.config.file
   file: path.join __dirname, 'config', 'config.json'
@@ -19,6 +20,7 @@ app.log = Winston.log
 
 require('./lib/routes').attach app
 
+app.RedisClient = redis.createClient(app.config.get('redisPort'), app.config.get('redisHost'))
 
 # Load our templates
 app.templates = {}
