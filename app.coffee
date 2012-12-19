@@ -76,6 +76,8 @@ app.router.get 'js/minified.js', ->
     javascript = ''
     javascripts = [
       'clientLib/jquery-1.8.0.min'
+      'clientLib/plates'
+      'css/javascripts/foundation/jquery.foundation.accordion'
     ]
     for name in javascripts
       javascript += fs.readFileSync app.dir + "/#{name}.js", 'utf8'
