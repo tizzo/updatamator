@@ -41,14 +41,13 @@ app.renderPage = (context)->
   data =
     'templates': app.renderTemplates(app.templates)
     'javascript-settings': 'var settings =' + JSON.stringify(settings) + ';'
-  return @renderTemplate 'index'
+  return @renderTemplate 'index', data
 
 app.sendResponse = (context, code, html, headers = {'Content-Type': 'text/html'})->
   context.res.writeHead code, headers
   context.res.end html
 
-settings =
-  app.mappings
+settings = {}
 
 # Serve css from our static directory
 app.http.before = [
