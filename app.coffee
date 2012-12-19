@@ -6,6 +6,7 @@ fs = require 'fs'
 ecstatic = require 'ecstatic'
 plates = require 'plates'
 redis = require 'redis'
+coffee = require 'coffee-script'
 
 app.config.file
   file: path.join __dirname, 'config', 'config.json'

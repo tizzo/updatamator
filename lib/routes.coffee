@@ -21,19 +21,3 @@ module.exports.attach = (app)->
       'Content-Type': 'application/json'
     context.res.json 'Updates recorded'
 
-  app.router.get 'js/minified.js', ->
-    if not app.clientScripts
-      javascript = ''
-      javascripts = [
-        'clientLib/jquery-1.8.0.min'
-      ]
-      for name in javascripts
-        javascript += fs.readFileSync app.dir + "/#{name}.js", 'utf8'
-      coffeescripts = [
-        'lib/client'
-      ]
-      for name in coffeescripts
-        javascript += coffee.compile fs.readFileSync "#{app.dir}/#{name}.coffee", 'utf8'
-      app.clientScripts = javascript
-    app.sendResponse this, 200, app.clientScripts,
-      'Content-Type': 'application/javascript'
