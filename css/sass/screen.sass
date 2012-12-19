@@ -7,16 +7,14 @@
 @import "foundation"
 @import "foundation/common/ratios"
 
-$dark-grey: #CCC
+$background: #FFF
 
 body
-  background: $dark-grey
+  background: $background
 
 .ui-dialog
   background: white
   padding: 2em
-  border: 2px solid $dark-grey
-  border-radius: 20px
 
 #top-navigation
   ul
@@ -31,27 +29,7 @@ body
   background: white
   @media screen and (min-width: 50em)
     margin-top: 3em
-    border-radius: 20px
     height: auto
-    border: 2px solid #042029
-
-  .current-task
-    border: 2px solid #ccc
-    padding: 1em
-    margin-bottom: 1.5em
-
-  #search
-    border: 2x solid #CCC
-  #search-results, #recent-tickets
-    margin:
-      left: auto
-      right: auto
-    table
-      width: 100%
-
-    table
-      td.start, td.track
-        width: 4em
 
 @media screen and (max-width: 50em)
   #page
