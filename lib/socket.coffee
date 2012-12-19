@@ -20,4 +20,4 @@ module.exports.attach = (app)->
     io.set key, value
 
   io.sockets.on 'connection', (socket)->
-    console.log 'connected'
+    # console.log 'connected'
