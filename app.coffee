@@ -34,12 +34,18 @@ app.mappings = require './views/mappings'
 app.renderTemplate = (name, data = {})->
   return plates.bind app.templates[name], data, app.mappings[name]
 
-app.renderPage = ()->
+app.renderPage = (context)->
+  data =
+    'templates': app.renderTemplates(app.templates)
+    'javascript-settings': 'var settings =' + JSON.stringify(settings) + ';'
   return @renderTemplate 'index'
 
 app.sendResponse = (context, code, html, headers = {'Content-Type': 'text/html'})->
   context.res.writeHead code, headers
   context.res.end html
+
+settings =
+  app.mappings
 
 # Serve css from our static directory
 app.http.before = [
@@ -48,6 +54,19 @@ app.http.before = [
     response.settings = {}
     next request, response
 ]
+
+app.renderTemplates = (templates)->
+  string = ''
+  index = templates['index']
+  delete templates['index']
+  items = for key, value of templates
+    item =
+      name: key
+      template: value
+  output = '<script id="template" type="text/x-plates-tmpl"></script>'
+  output = plates.bind(output, items, app.mappings['template'])
+  templates['index'] = index
+  return output
 
 # Serve our client side javascript.
 app.router.get 'js/minified.js', ->
