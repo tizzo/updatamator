@@ -44,8 +44,9 @@ app.sendResponse = (context, code, html, headers = {'Content-Type': 'text/html'}
 # Serve css from our static directory
 app.http.before = [
   ecstatic __dirname + '/css', { autoIndex: false}
-  (request, response)->
+  (request, response, next)->
     response.settings = {}
+    next request, response
 ]
 
 # Serve our client side javascript.
