@@ -16,7 +16,7 @@ app.use flatiron.plugins.http
 Winston.loggers.add 'default',
   console:
     level: '',
-    colorize: 'true'
+    colorize: true
 app.log = Winston.log
 
 require('./lib/routes').attach app
@@ -47,7 +47,11 @@ app.sendResponse = (context, code, html, headers = {'Content-Type': 'text/html'}
   context.res.writeHead code, headers
   context.res.end html
 
-settings = {}
+
+settings =
+  mappings: {}
+
+settings.mappings[name] = mapping.mappings for name, mapping of app.mappings
 
 # Serve css from our static directory
 app.http.before = [
