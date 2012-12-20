@@ -19,6 +19,10 @@ Winston.loggers.add 'default',
     colorize: true
 app.log = Winston.log
 
+if app.config.get 'testing'
+  console.log 'Booting into testing mode.'
+  redis = require 'fakeredis'
+
 require('./lib/routes').attach app
 
 app.RedisClient = redis.createClient(app.config.get('redisPort'), app.config.get('redisHost'))
