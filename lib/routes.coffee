@@ -1,5 +1,5 @@
-coffee = require 'coffee-script'
 fs = require 'fs'
+Server = require('./server').server
 
 module.exports.attach = (app)->
   app.router.get '/', ->
@@ -12,6 +12,9 @@ module.exports.attach = (app)->
     if data.hostname and data.updates
       response = 201
       message = 'Updates recorded'
+      server = new Server(data, app.RedisClient)
+      server.save()
+      # app.log 'info', "Update information received from #{server.getHostname()}"
     else
       response = 500
       message = 'Message parsing failed'
