@@ -4,7 +4,10 @@ Server = require('./server').server
 module.exports.attach = (app)->
   app.router.get '/', ->
     context = this
-    app.sendResponse context, 200, app.renderPage(context)
+    content = app.renderTemplate 'available-packages', 'available-packages': app.renderTemplate 'available-package'
+    data =
+      content: content
+    app.sendResponse context, 200, app.renderPage context, data
 
   app.router.post '/package-updates', ->
     context = this

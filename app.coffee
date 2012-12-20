@@ -41,10 +41,9 @@ app.mappings = require './views/mappings'
 app.renderTemplate = (name, data = {})->
   return plates.bind app.templates[name], data, app.mappings[name]
 
-app.renderPage = (context)->
-  data =
-    'templates': app.renderTemplates(app.templates)
-    'javascript-settings': 'var settings =' + JSON.stringify(settings) + ';'
+app.renderPage = (context, data)->
+  data['templates'] = app.renderTemplates(app.templates)
+  data['javascript-settings'] = 'var settings =' + JSON.stringify(settings) + ';'
   return @renderTemplate 'index', data
 
 app.sendResponse = (context, code, html, headers = {'Content-Type': 'text/html'})->
