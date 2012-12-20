@@ -1,7 +1,16 @@
 {
+  "_comment": "The main port to listen on.",
   "port": 3005,
+  "_comment": "SocketIO port. Can be different to help with load balancers.",
   "socketIOPort": 3005,
+  "_comment": "A hash of socketIO settings to be passed to `io.set`.",
+  "socketIOSettings": {
+    "log level": 1
+  },
+  "_comment": "Redis host to connect to.",
   "redisHost": "127.0.0.1",
+  "_comment": "Redis port to connect to.",
   "redisPort": 6379,
+  "_comment": "Whether we're in testing. A mock redis is used in testing.",
   "testing": false
 }
