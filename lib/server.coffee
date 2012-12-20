@@ -12,13 +12,27 @@ module.exports.server = class Server
     @updates = data.updates
 
   save: (next = false)->
-    @redisClient.set @getHostname(), @getUpdates().join(':')
-    if next
-      next()
+    multi = @redisClient.multi()
+    multi.set @getHostname(), @getPackageString()
+    multi.sadd @getPackageString(), @getHostname()
+    multi.sadd 'hosts', @getHostname()
+    multi.sadd 'packages', @getPackageString()
+    multi.set "#{@getPackageString()}:release-notes", JSON.stringify @getPackageNotes()
+    multi.exec (error, response) ->
+      if next and error
+        next error, null
+      else if next and not error
+        next null, true
 
+  getPackageNotes: ->
+    notes = {}
+    notes[packageName] = note for packageName, note of @updates
+    notes
   getHostname: -> @hostname
-  getUpdates: ->
+  getPackages: ->
     updates = []
     updates.push update for update, notes of @updates
     updates
+  getPackageString: ->
+    @getPackages().join(':')
 
