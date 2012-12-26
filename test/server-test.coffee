@@ -1,5 +1,5 @@
 assert = require 'assert'
-Server = require('../lib/server').server
+Server = require('../lib/server').Server
 redis = require 'fakeredis'
 redisClient = redis.createClient()
 

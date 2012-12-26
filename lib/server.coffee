@@ -1,4 +1,4 @@
-module.exports.server = class Server
+module.exports.Server = class Server
   hostname: ''
   version: ''
   updates: []
