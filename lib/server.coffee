@@ -22,17 +22,24 @@ module.exports.Server = class Server
       if next and error
         next error, null
       else if next and not error
-        next null, true
+        next false, true
 
   getPackageNotes: ->
     notes = {}
     notes[packageName] = note for packageName, note of @updates
     notes
+
   getHostname: -> @hostname
+
   getPackages: ->
     updates = []
     updates.push update for update, notes of @updates
     updates
-  getPackageString: ->
-    @getPackages().join(':')
 
+  getPackageString: ->
+    packageVersions = []
+    packageVersions.push "#{packageName}@#{details.version}" for packageName, details of @updates
+    packageVersions.join(':')
+
+  setUpdateCommand: (command)->
+    @updateCommand = command
