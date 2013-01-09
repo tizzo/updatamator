@@ -2,9 +2,12 @@ module.exports.Server = class Server
   hostname: ''
   version: ''
   updates: []
+  app: {}
   redisClient: {}
-  constructor: (data, redisClient)->
-    @redisClient = redisClient
+  updateCommand: ''
+  constructor: (data, app)->
+    @app = app
+    @redisClient = app.RedisClient
     @set(data)
   set: (data)->
     @hostname = data.hostname

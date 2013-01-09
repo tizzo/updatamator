@@ -1,12 +1,12 @@
 assert = require 'assert'
 Server = require('../lib/server').Server
-redis = require 'fakeredis'
-redisClient = redis.createClient()
+app = require './mock-app'
+redisClient = app.RedisClient
 
 # TODO: Isn't there some way to pass variables forward in tests?
 # it 'should accept data as the constructor', ->
 data = require('./json-samples/json-sample-1')
-server = new Server(data, redisClient)
+server = new Server(data, app)
 
 describe 'Server', ->
   describe '#getHostname()', ->

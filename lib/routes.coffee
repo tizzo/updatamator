@@ -15,7 +15,7 @@ module.exports.attach = (app)->
     if data.hostname and data.updates
       response = 201
       message = 'Updates recorded'
-      server = new Server(data, app.RedisClient)
+      server = new Server(data, app)
       server.save()
       # app.log 'info', "Update information received from #{server.getHostname()}"
     else
