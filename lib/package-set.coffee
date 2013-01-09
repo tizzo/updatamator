@@ -1,6 +1,9 @@
 module.exports.PackageSet = class PackageSet
   app: {}
   redisClient: {}
+  servers: []
+  packageString: ''
+  releaseNotes: {}
   constructor: (app)->
     @app = app
     @redisClient = app.RedisClient
@@ -10,7 +13,20 @@ module.exports.PackageSet = class PackageSet
     @updates = data.updates
     this
   load: (packageString, next)->
+    @servers = []
+    @packageString = packageString
     multi = @redisClient.multi()
+    multi.smembers packageString
+    multi.get "#{@packageString}:release-notes"
+    that = this
     multi.exec (error, data)->
-      console.log data
-    this
+      that.servers = data[0]
+      that.releaseNotes = data[1]
+      next error
+  getServers: ->
+    @servers
+  getReleaseNotes: ->
+    @releaseNotes
+  listSets: (next) ->
+    @redisClient.smembers 'packages', (error, packageSets)->
+      next error, packageSets

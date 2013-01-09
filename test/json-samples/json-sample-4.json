@@ -1,0 +1,9 @@
+{
+  "hostname": "server4.example.com",
+  "updates": {
+    "package-two": {
+      "version": "1.0.1-0ubuntu3.7",
+      "release_notes": "Release notes for package two."
+    }
+  }
+}
