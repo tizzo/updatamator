@@ -21,12 +21,14 @@ module.exports.PackageSet = class PackageSet
     that = this
     multi.exec (error, data)->
       that.servers = data[0]
-      that.releaseNotes = data[1]
+      that.releaseNotes = JSON.parse(data[1])
       next error
   getServers: ->
     @servers
   getReleaseNotes: ->
-    @releaseNotes
+    # return this.releaseNotes
+  listPackages: ->
+    item for item, notes of @releaseNotes
   listSets: (next) ->
     @redisClient.smembers 'packages', (error, packageSets)->
       next error, packageSets
