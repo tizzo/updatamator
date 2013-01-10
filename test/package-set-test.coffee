@@ -16,18 +16,19 @@ new Server(require('./json-samples/json-sample-3'), app).save()
 new Server(require('./json-samples/json-sample-4'), app).save()
 
 describe 'PackageSet', ->
+  sets = []
   describe '#listSets()', ->
     it 'should find two package sets', ->
       packageSet.listSets (error, sets)->
         assert.equal sets.length, 2, 'Two package sets found'
-  describe '#load()', ->
-    sets = []
+  it 'should load data properly', (done)->
+    packageSet.listSets (error, loadedSets)->
+      sets = loadedSets
+      packageSet.load sets[0], (error)->
+        console.log 'run'
+        done()
+  describe 'loaded data methods', ->
     # Perform a fresh load before each
-    beforeEach  (done)->
-      packageSet.listSets (error, result)->
-        sets = result
-        packageSet.load sets[0], (error)->
-          done()
     describe '#getServers()', ->
       it 'should have two servers in the first package set', (done)->
         assert.equal packageSet.getServers().length, 2, 'Two servers found in the first package set.'
