@@ -122,7 +122,8 @@ if [ -n "$PKGNAMES" ] ; then
     ELEMENT=`printf '"%s": { "version": "%b", "release_notes": %s }' ${PKG} ${VER} "${NOTES}"`
     JSON_STRING="$JSON_STRING $ELEMENT"
   done
-  JSON_STRING="{ \"hostname\": \"$SYSTEM\", \"updates\": { $JSON_STRING } }"
+  ISSUE=`cat /etc/issue`
+  JSON_STRING="{ \"hostname\": \"$SYSTEM\", \"issue\": \"$ISSUE\", \"updates\": { $JSON_STRING } }"
   echo $JSON_STRING
 
   # TODO: We're not handling the package holds reported by apticron.'
