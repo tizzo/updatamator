@@ -17,7 +17,7 @@ module.exports.attach = (app)->
       message = 'Updates recorded'
       server = new Server(data, app)
       server.save()
-      # app.log 'info', "Update information received from #{server.getHostname()}"
+      app.info "Update information received from #{server.getHostname()}"
     else
       response = 500
       message = 'Message parsing failed'
