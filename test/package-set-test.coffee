@@ -25,7 +25,6 @@ describe 'PackageSet', ->
     packageSet.listSets (error, loadedSets)->
       sets = loadedSets
       packageSet.load sets[0], (error)->
-        console.log 'run'
         done()
   describe 'loaded data methods', ->
     # Perform a fresh load before each
@@ -40,11 +39,12 @@ describe 'PackageSet', ->
           done()
     describe '#listPackages', ->
       it 'should list one package', ->
-        packageSet
+        assert.equal packageSet.listPackages().length, 1
+        assert.equal packageSet.listPackages().pop(), 'package-one'
     describe '#getReleaseNotes()', ->
       it 'should be a hash containing all of the release notes for each package.', (done)->
+        assert.equal packageSet.getReleaseNotes()['package-one'].version, '1.0.2-0ubuntu3.5'
         done()
-        # assert.equal packageSet.getReleaseNotes()
     describe '#updateServers()', ->
       it 'should run the update command on each server', (done)->
         # TODO: run some code here
