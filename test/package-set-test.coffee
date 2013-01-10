@@ -21,25 +21,30 @@ describe 'PackageSet', ->
       packageSet.listSets (error, sets)->
         assert.equal sets.length, 2, 'Two package sets found'
   describe '#load()', ->
-    it 'should load data properly', ->
-      packageSet.listSets (error, sets)->
+    sets = []
+    # Perform a fresh load before each
+    beforeEach  (done)->
+      packageSet.listSets (error, result)->
+        sets = result
         packageSet.load sets[0], (error)->
-          describe '#getServers()', ->
-            it 'should have two servers in the first package set', ->
-              assert.equal packageSet.getServers().length, 2, 'Two servers found in the first package set.'
-            it 'should have one server in the second package set', (done) ->
-              packageSet2 = new PackageSet(app)
-              packageSet2.load sets[1], (error)->
-                assert.equal packageSet2.getServers().length, 1, 'One server found in the second package set.'
-                done()
-          describe '#listPackages', ->
-            it 'should list one package', (done)->
-              console.log packageSet.listPackages()
-          describe '#getReleaseNotes()', ->
-            it 'should be a hash containing all of the release notes for each package.', (done)->
-              assert.equal packageSet.getReleaseNotes()
-              done()
-          describe '#updateServers()', ->
-            it 'should run the update command on each server', (done)->
-              # TODO: run some code here
-              done()
+          done()
+    describe '#getServers()', ->
+      it 'should have two servers in the first package set', (done)->
+        assert.equal packageSet.getServers().length, 2, 'Two servers found in the first package set.'
+        done()
+      it 'should have one server in the second package set', (done)->
+        packageSet2 = new PackageSet(app)
+        packageSet2.load sets[1], (error)->
+          assert.equal packageSet2.getServers().length, 1, 'One server found in the second package set.'
+          done()
+    describe '#listPackages', ->
+      it 'should list one package', ->
+        packageSet
+    describe '#getReleaseNotes()', ->
+      it 'should be a hash containing all of the release notes for each package.', (done)->
+        done()
+        # assert.equal packageSet.getReleaseNotes()
+    describe '#updateServers()', ->
+      it 'should run the update command on each server', (done)->
+        # TODO: run some code here
+        done()

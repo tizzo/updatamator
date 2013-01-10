@@ -26,7 +26,7 @@ module.exports.PackageSet = class PackageSet
   getServers: ->
     @servers
   getReleaseNotes: ->
-    # return this.releaseNotes
+    @releaseNotes
   listPackages: ->
     item for item, notes of @releaseNotes
   listSets: (next) ->
