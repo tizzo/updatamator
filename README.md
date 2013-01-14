@@ -6,7 +6,7 @@ Updatamator automates keeping track of available packages and issue commands to 
 
 Currently only tested with debian and apt is the only system for which a script is provided. The script in bin/apticronjson.sh is a fork of apticron to generate valid json on stdout rather than sending emails. Currently it's up to you to post the information to your updatamator server. Here's an example of how to do that with our test data.
 
-    curl -H "Content-Type: application/json" -d @test/json-samples/json-sample-1.json -X POt:3005/package-updates
+    curl -H "Content-Type: application/json" -d @test/json-samples/json-sample-1.json -X POST localhost:3005/package-updates
 
 ## CSS
 
