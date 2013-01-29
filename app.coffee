@@ -77,26 +77,6 @@ app.renderTemplates = (templates)->
   templates['index'] = index
   return output
 
-# Serve our client side javascript.
-app.router.get 'js/minified.js', ->
-  if not app.clientScripts
-    javascript = ''
-    javascripts = [
-      'clientLib/jquery-1.8.0.min'
-      'clientLib/plates'
-      'css/javascripts/foundation/jquery.foundation.accordion'
-    ]
-    for name in javascripts
-      javascript += fs.readFileSync app.dir + "/#{name}.js", 'utf8'
-    coffeescripts = [
-      'lib/client'
-    ]
-    for name in coffeescripts
-      javascript += coffee.compile fs.readFileSync "#{app.dir}/#{name}.coffee", 'utf8'
-    app.clientScripts = javascript
-  app.sendResponse this, 200, app.clientScripts,
-    'Content-Type': 'application/javascript'
-
 app.start app.config.get 'port'
 app.log.log 'info', "Application listening on port #{app.config.get 'port'}"
 require('./lib/socket').attach app

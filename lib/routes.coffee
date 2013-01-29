@@ -1,5 +1,8 @@
 fs = require 'fs'
+coffee = require 'coffee-script'
 Server = require('./server').Server
+PackageSet = require('../lib/package-set').PackageSet
+async = require 'async'
 
 module.exports.attach = (app)->
   app.router.get '/', ->
@@ -25,3 +28,24 @@ module.exports.attach = (app)->
       'Content-Type': 'application/json'
     context.res.json message
 
+
+
+  # Serve our client side javascript.
+  app.router.get 'js/minified.js', ->
+    if not app.clientScripts
+      javascript = ''
+      javascripts = [
+        'clientLib/jquery-1.8.0.min'
+        'clientLib/plates'
+        'css/javascripts/foundation/jquery.foundation.accordion'
+      ]
+      for name in javascripts
+        javascript += fs.readFileSync app.dir + "/#{name}.js", 'utf8'
+      coffeescripts = [
+        'lib/client'
+      ]
+      for name in coffeescripts
+        javascript += coffee.compile fs.readFileSync "#{app.dir}/#{name}.coffee", 'utf8'
+      app.clientScripts = javascript
+    app.sendResponse this, 200, app.clientScripts,
+      'Content-Type': 'application/javascript'
