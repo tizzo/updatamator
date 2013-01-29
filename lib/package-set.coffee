@@ -38,3 +38,15 @@ module.exports.PackageSet = class PackageSet
   listSets: (next) ->
     @redisClient.smembers 'packages', (error, packageSets)->
       next error, packageSets
+  updateServers: ->
+    app = @app
+    runUpdates = (hostname, done)->
+      # console.log done
+      server = new Server({}, app)
+      server.load hostname, (error)->
+        done error
+    async.forEach @getServers(), runUpdates, (error)->
+      if error
+        console.log "An error occured and we'll need to sort that out."
+
+
