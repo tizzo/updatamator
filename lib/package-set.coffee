@@ -1,3 +1,6 @@
+async = require 'async'
+Server = require('./server').Server
+
 module.exports.PackageSet = class PackageSet
   app: {}
   redisClient: {}
@@ -20,9 +23,12 @@ module.exports.PackageSet = class PackageSet
     multi.get "#{@packageString}:release-notes"
     that = this
     multi.exec (error, data)->
-      that.servers = data[0]
-      that.releaseNotes = JSON.parse(data[1])
-      next error
+      if error
+        next error
+      else
+        that.servers = data[0]
+        that.releaseNotes = JSON.parse(data[1])
+        next null, that
   getServers: ->
     @servers
   getReleaseNotes: ->
