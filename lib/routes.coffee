@@ -7,10 +7,28 @@ async = require 'async'
 module.exports.attach = (app)->
   app.router.get '/', ->
     context = this
-    content = app.renderTemplate 'available-packages', 'available-packages': app.renderTemplate 'available-package'
-    data =
-      content: content
-    app.sendResponse context, 200, app.renderPage context, data
+    packageSet = new PackageSet(app)
+    packageSet.listSets (error, sets)->
+      loadPackageSet = (packageString, next)->
+        item = new PackageSet(app)
+        item.load packageString, (error)->
+          if error
+            return next error
+          item.getThemableOutput (error, output)->
+            next error, output
+      async.map sets, loadPackageSet, (error, packageSets)->
+        if error
+          app.log.error 'Error loading packages for display', error
+          return
+        console.log packageSets
+        for i, packageSet of packageSets
+          console.log(packageSet.packages)
+          packageSets[i]['available-packages'] = app.renderTemplate 'package-detail', packageSet.packages
+        availablePackageSets = app.renderTemplate 'available-package-set', packageSets
+        content = app.renderTemplate 'available-package-sets', 'available-package-sets': availablePackageSets
+        data =
+          content: content
+        app.sendResponse context, 200, app.renderPage context, data
 
   app.router.post '/package-updates', ->
     context = this
