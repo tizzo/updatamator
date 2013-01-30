@@ -10,9 +10,12 @@ module.exports.Server = class Server
     @redisClient = app.RedisClient
     @set(data)
   set: (data)->
-    @hostname = data.hostname
-    @version = ''
-    @updates = data.updates
+    if data.hostname
+      @hostname = data.hostname
+    if data.version
+      @version = ''
+    if data.updates
+      @updates = data.updates
 
   save: (next = false)->
     multi = @redisClient.multi()
