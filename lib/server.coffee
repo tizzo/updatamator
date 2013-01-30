@@ -30,6 +30,22 @@ module.exports.Server = class Server
       else if next and not error
         next false, true
 
+  load: (hostname, next)->
+    @hostname = hostname
+    multi = @redisClient.multi()
+    @redisClient.get @getHostname(), (error, packageString)->
+      @packageString = packageString
+      next(error, packageString)
+    # multi.sadd @getPackageString(), @getHostname()
+    # multi.sadd 'hosts', @getHostname()
+    # multi.sadd 'packages', @getPackageString()
+    # multi.set "#{@getPackageString()}:release-notes", JSON.stringify @getPackageNotes()
+    # multi.exec (error, response) ->
+    #  if next and error
+    #    next error, null
+    #  else if next and not error
+    #    next false, true
+
   getPackageNotes: ->
     notes = {}
     notes[packageName] = note for packageName, note of @updates
