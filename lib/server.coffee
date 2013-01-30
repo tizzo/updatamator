@@ -65,3 +65,17 @@ module.exports.Server = class Server
 
   setUpdateCommand: (command)->
     @updateCommand = command
+
+  runUpdates: ->
+    console.log 'run updates'
+    return
+    multi = @redisClient.multi()
+    multi.srem 'hosts', @getHostname()
+    multi.srem @getPackageString(), @getHostname()
+    # TODO: Check the total number in the package and remove the string if empty?
+    # multi.srem 'packages', @getPackageString()
+    # TODO: Check the total number in the servers in the string and clear the gc the release notes if empty?
+    # multi.del "#{@getPackageString()}:release-notes", JSON.stringify @getPackageNotes()
+    multi.exec (error, response)->
+      console.log "Update run for #{@getHostname()}"
+      # @runApticronScript()?
