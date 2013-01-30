@@ -37,7 +37,7 @@ describe 'PackageSet', ->
         packageSet2.load sets[1], (error)->
           assert.equal packageSet2.getServers().length, 1, 'One server found in the second package set.'
           done()
-    describe '#listPackages', ->
+    describe '#listPackages()', ->
       it 'should list one package', ->
         assert.equal packageSet.listPackages().length, 1
         assert.equal packageSet.listPackages().pop(), 'package-one'
@@ -45,7 +45,14 @@ describe 'PackageSet', ->
       it 'should be a hash containing all of the release notes for each package.', (done)->
         assert.equal packageSet.getReleaseNotes()['package-one'].version, '1.0.2-0ubuntu3.5'
         done()
+    describe '#getThemableOutput()', ->
+      it 'should get the plain old JSON representation for rendering', (done)->
+        packageSet.getThemableOutput (error, object)->
+          assert.equal object.serverList, 'server2.example.com, server3.example.com'
+          assert.equal object.packages.length, 1
+          done()
     describe '#updateServers()', ->
       it 'should run the update command on each server', (done)->
         # TODO: run some code here
+        packageSet.updateServers()
         done()

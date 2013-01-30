@@ -35,9 +35,20 @@ module.exports.PackageSet = class PackageSet
     @releaseNotes
   listPackages: ->
     item for item, notes of @releaseNotes
+  # TODO: Move this elsewhere.
   listSets: (next) ->
     @redisClient.smembers 'packages', (error, packageSets)->
       next error, packageSets
+  # Renders a plain old javascript object for rendering
+  getThemableOutput: (next)->
+    packages = []
+    for title, item of @getReleaseNotes()
+      item.title = title
+      packages.push item
+    json =
+      serverList: @getServers().join ', '
+      packages: packages
+    next null, json
   updateServers: ->
     app = @app
     runUpdates = (hostname, done)->
