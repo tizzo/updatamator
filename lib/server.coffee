@@ -2,6 +2,7 @@ module.exports.Server = class Server
   hostname: ''
   version: ''
   updates: []
+  issue: ''
   app: {}
   redisClient: {}
   updateCommand: ''
@@ -16,12 +17,15 @@ module.exports.Server = class Server
       @version = ''
     if data.updates
       @updates = data.updates
+    if data.issue
+      @issue = data.issue
 
   save: (next = false)->
     multi = @redisClient.multi()
     multi.set @getHostname(), @getPackageString()
     multi.sadd @getPackageString(), @getHostname()
     multi.sadd 'hosts', @getHostname()
+    multi.sadd 'issues', @getIssue()
     multi.sadd 'packages', @getPackageString()
     multi.set "#{@getPackageString()}:release-notes", JSON.stringify @getPackageNotes()
     multi.exec (error, response) ->
@@ -52,6 +56,8 @@ module.exports.Server = class Server
     notes
 
   getHostname: -> @hostname
+
+  getIssue: -> @issue
 
   getPackages: ->
     updates = []

@@ -1,5 +1,6 @@
 {
   "hostname": "server4.example.com",
+  "issue": "Ubuntu 10.04.4 LTS",
   "updates": {
     "package-two": {
       "version": "1.0.1-0ubuntu3.7",
