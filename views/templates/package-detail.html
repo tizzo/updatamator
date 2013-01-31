@@ -1,14 +1,17 @@
 <li>
   <!-- TODO: I had planned to nest Zurb accordions but that is not supported. Need a new interface paradigm here. -->
   <div class="title-non-zurb">
-    <h6 class='package-title'>Name of package</h6>
-  </div>
-  <div class="content-non-zurb">
     <div class="version-container">
-      <span class="version-label">Version: </span><span class="version"></span>
+      <span class="package-label package-info-label">Package: </span><span class='package-title'>Name of package</span>
+    </div>
+    <div class="version-container">
+      <span class="version-label package-info-label">Version: </span><span class="version">0.0.0</span>
     </div>
     <div class="release-notes-container">
-      <span class="release-notes-label">Release Notes: </span><span class="release-notes"></span>
+      <span class="release-notes-label package-info-label">Release Notes: </span>
+      <div class="release-notes-wrapper">
+        <pre class="release-notes-detail">Details about the release</pre>
+      </div>
     </div>
   </div>
 </li>
