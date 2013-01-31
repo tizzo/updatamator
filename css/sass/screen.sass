@@ -6,6 +6,7 @@
 @import "compass/reset"
 @import "foundation"
 @import "foundation/common/ratios"
+@import "compass/css3/transition"
 
 $background: #FFF
 
@@ -30,6 +31,26 @@ body
   @media screen and (min-width: 50em)
     margin-top: 3em
     height: auto
+
+  .available-packages
+    margin: 0
+    padding: 1em
+    background: #f8f8f8
+    border: 1px solid #ccc
+
+    span.package-info-label
+      font-weight: bold
+
+  .package-set-collapsible
+    background: #fff
+    cursor: pointer
+    padding: 8px
+    margin: 0
+    border-left: 1px solid #e9e9e9
+    +transition-property(background)
+    +transition-duration(0.15s)
+    +transition-timing-function(linear)
+
 
 @media screen and (max-width: 50em)
   #page
