@@ -19,16 +19,29 @@ $(document).ready ($)->
 
     # Setup internal pacakge detail collapsible behavior.
     packageDetails = $('.release-details ul.available-packages', this).hide()
-    $('.release-details h5').click (event)->
+    $('.release-details h5', this).click (event)->
       packageDetails.slideToggle('slow')
 
 
+    logs = $('.update-logs', this)
+    serverLogs = $('.server-logs', logs).hide()
+    $('h5.update-logs-title', this).click (event)->
+      serverLogs.slideToggle('slow')
+    $('input.update').click (event)->
+      serverLogs.show()
+    $('.server', serverLogs).each ->
+      server = this
+      $('h6.server-name', server).click ->
+        console.log 'toggle'
+        $('.log-code', server).slideToggle()
 
-  # TODO: get the url dynamically
-  socket = io.connect('http://localhost:3005');
-  socket.on 'data', (data)->
-    console.log data
-
+  socket = io.connect()
+  # Internal cache for
+  elements = {}
+  socket.on 'serverLogMessage', (message)->
+    if not elements[message.cssName]
+      elements[message.cssName] = $(".server##{message.cssName}-logs .log-contents")
+    elements[message.cssName].append Plates.bind app.templates['server-logs-message'], message, window.mappings['server-logs-message']
 
 root = exports ? this
 root.app = app
