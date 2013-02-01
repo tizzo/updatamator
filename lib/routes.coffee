@@ -64,6 +64,7 @@ module.exports.attach = (app)->
         javascript += fs.readFileSync app.dir + "/#{name}.js", 'utf8'
       coffeescripts = [
         'lib/client'
+        'views/mappings'
       ]
       for name in coffeescripts
         javascript += coffee.compile fs.readFileSync "#{app.dir}/#{name}.coffee", 'utf8'
