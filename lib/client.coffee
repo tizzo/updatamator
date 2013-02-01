@@ -7,12 +7,17 @@ for template, mapping in settings.mappings
   app.mappings[template].mappings = mapping
 
 $(document).ready ($)->
+  # Load our templates into memory for client side rendering.
   $('#templates script').each -> app.templates[$(this).attr 'id'] = $(this).text()
   $('#templates').remove()
+
+  # Activate Foudnation accordion.
   $('#page ul.accordion').foundationAccordion()
+
+  # Setup each package set.
   $('li.available-package-set').each ()->
-    console.log this
-    console.log arguments
+
+    # Setup internal pacakge detail collapsible behavior.
     packageDetails = $('.release-details ul.available-packages', this).hide()
     $('.release-details h5').click (event)->
       packageDetails.slideToggle('slow')
