@@ -19,5 +19,9 @@ module.exports.attach = (app)->
   for key, value of app.config.get 'socketIOSettings'
     io.set key, value
 
+  app.on 'serverLogMessage', (message)->
+    io.sockets.emit 'serverLogMessage', message
+
   io.sockets.on 'connection', (socket)->
     # console.log 'connected'
+
