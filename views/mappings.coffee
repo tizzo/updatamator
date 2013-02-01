@@ -1,4 +1,4 @@
-
+# This file is used on both client and server.
 mappings = {}
 
 if (typeof exports == 'object' and exports)
