@@ -57,6 +57,9 @@ module.exports.Server = class Server
 
   getHostname: -> @hostname
 
+  getCSSName: ->
+    @getHostname().replace(/\./g, '-')
+
   getIssue: -> @issue
 
   getPackages: ->
