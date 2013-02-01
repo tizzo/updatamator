@@ -31,6 +31,14 @@ module.exports.PackageSet = class PackageSet
         next null, that
   getServers: ->
     @servers
+  getLoadedServers: (done)->
+    app = @app
+    loadServer = (hostname, next)->
+      server = new Server({}, app)
+      server.load hostname, (error)->
+        next error, server
+    async.map @getServers(), loadServer, (error, servers)->
+      done error, servers
   getReleaseNotes: ->
     @releaseNotes
   listPackages: ->
@@ -51,13 +59,5 @@ module.exports.PackageSet = class PackageSet
     next null, json
   updateServers: ->
     app = @app
-    runUpdates = (hostname, done)->
-      # console.log done
-      server = new Server({}, app)
-      server.load hostname, (error)->
-        done error
-    async.forEach @getServers(), runUpdates, (error)->
-      if error
-        console.log "An error occured and we'll need to sort that out."
 
 

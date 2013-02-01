@@ -51,6 +51,12 @@ describe 'PackageSet', ->
           assert.equal object.serverList, 'server2.example.com, server3.example.com'
           assert.equal object.packages.length, 1
           done()
+    describe '#getLoadedServers()', ->
+      it 'should load each of the servers properly', (done)->
+        packageSet.getLoadedServers (error, servers)->
+          assert.equal servers[0].getHostname(), 'server2.example.com'
+          assert.equal servers[1].getHostname(), 'server3.example.com'
+        done()
     describe '#updateServers()', ->
       it 'should run the update command on each server', (done)->
         # TODO: run some code here
