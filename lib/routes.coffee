@@ -15,15 +15,18 @@ module.exports.attach = (app)->
           if error
             return next error
           item.getThemableOutput (error, output)->
+            output.packageSet = item
             next error, output
       async.map sets, loadPackageSet, (error, packageSets)->
         if error
           app.log.error 'Error loading packages for display', error
           return
-        console.log packageSets
         for i, packageSet of packageSets
-          console.log(packageSet.packages)
           packageSets[i]['available-packages'] = app.renderTemplate 'package-detail', packageSet.packages
+          servers = packageSet.packageSet.getServers()
+          # TODO: this server.replace is duplicated from Server::getCSSName(), perhaps we should us that code somehow?
+          servers = ({'server-name': server, 'css-name': "#{server.replace(/\./g, '-')}-logs"} for server in servers)
+          packageSets[i]['server-logs'] = app.renderTemplate 'server-logs', servers
         availablePackageSets = app.renderTemplate 'available-package-set', packageSets
         content = app.renderTemplate 'available-package-sets', 'available-package-sets': availablePackageSets
         data =
