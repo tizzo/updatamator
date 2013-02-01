@@ -32,7 +32,7 @@ body
     margin-top: 3em
     height: auto
 
-  .available-packages
+  .available-packages, .log-contents
     margin: 0
     padding: 1em
     background: #f8f8f8
@@ -41,7 +41,7 @@ body
     span.package-info-label
       font-weight: bold
 
-  .package-set-collapsible
+  .collapsible-title
     background: #fff
     cursor: pointer
     padding: 8px
@@ -50,6 +50,10 @@ body
     +transition-property(background)
     +transition-duration(0.15s)
     +transition-timing-function(linear)
+
+  .server
+    .stderr pre.message
+      color: red
 
 
 @media screen and (max-width: 50em)
