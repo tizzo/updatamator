@@ -36,7 +36,7 @@ for name in fs.readdirSync __dirname + '/views/templates'
 app.dir = __dirname
 
 # Load our mappings
-app.mappings = require './views/mappings'
+app.mappings = require('./views/mappings').mappings
 
 app.renderTemplate = (name, data = {})->
   return plates.bind app.templates[name], data, app.mappings[name]

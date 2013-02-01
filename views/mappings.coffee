@@ -1,7 +1,13 @@
-Plates = require 'plates'
 
 mappings = {}
-module.exports = mappings
+
+if module
+  Plates = require 'plates'
+  root = module.exports
+else
+  root = this
+
+root.mappings = mappings
 
 map = Plates.Map()
 map.where('class').is('project-option').use('title')
