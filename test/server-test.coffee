@@ -12,6 +12,9 @@ describe 'Server', ->
   describe '#getHostname()', ->
     it 'should report the hostname', ->
       assert.equal server.getHostname(), 'server1.example.com'
+  describe '#getCSSName()', ->
+    it 'should provide a css class safe representation of the hostname', ->
+      assert.equal server.getCSSName(), 'server1-example-com'
   describe '#getPackages()', ->
     it 'should return the list of packages', ->
       assert.equal server.getPackages().length, 36, 'Correct number of packages found'
