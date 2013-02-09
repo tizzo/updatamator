@@ -20,14 +20,24 @@ describe 'Server', ->
       assert.equal server.getPackages().length, 36, 'Correct number of packages found'
       assert.equal server.getPackages()[35], 'perl-modules'
       assert.equal server.getPackages()[0], 'apparmor'
+  describe '#packageString()', ->
+    it 'should receive the ', ->
   describe '#save()', ->
     it 'should persist the server and package information to redis', ->
       server.save ->
-        redisClient.get 'server1.example.com', (error, data)->
-          assert.equal 1262, data.length, 'Correct package list has been retrieved.'
-        redisClient.sismember server.getPackageString(), 'server1.example.com', (error, data)->
-          assert.equal data, true, 'Hostname is in package list'
-        redisClient.sismember 'hosts', server.getHostname(), (error, data)->
-          assert.equal data, true, 'Hostname is in hosts list'
-        redisClient.sismember 'packages', server.getPackageString(), (error, data)->
-          assert.equal data, true, 'Package string is in packages list.'
+        it 'should retrieve the correct package list', (done)->
+          redisClient.get 'server1.example.com', (error, data)->
+            assert.equal 1262, data.length
+            done()
+        it 'should find the hostname in list of servers for the package string', (done)->
+          redisClient.sismember server.getPackageString(), 'server1.example.com', (error, data)->
+            assert.equal data, true
+            done()
+        it 'should find the hostname in hosts list', (done)->
+          redisClient.sismember 'hosts', server.getHostname(), (error, data)->
+            assert.equal data, true
+            done()
+        it 'should find the package string in packages list.', (done)->
+          redisClient.sismember 'packages', server.getPackageString(), (error, data)->
+            assert.equal data, true
+            done()
