@@ -7,11 +7,19 @@ module.exports.Server = class Server
   issue: ''
   app: {}
   redisClient: {}
-  updateCommand: ''
+  remoteUpdater: null
+
   constructor: (data, app)->
     @app = app
     @redisClient = app.RedisClient
     @set(data)
+    if @app.config.get 'testing'
+      Updater = require('../test/plugins/testSSH2RemoteExecutor').Updater
+    else
+      console.log 'here'
+      Updater = require('./plugins/ssh2RemoteExecutor').Updater
+    @remoteUpdater = new Updater(app, this)
+
   set: (data)->
     if data.hostname
       @hostname = data.hostname
@@ -77,9 +85,6 @@ module.exports.Server = class Server
     shasum.digest 'hex'
 
 
-  setUpdateCommand: (command)->
-    @updateCommand = command
-
   runUpdates: ->
     console.log 'run updates'
     return
@@ -93,3 +98,4 @@ module.exports.Server = class Server
     multi.exec (error, response)->
       console.log "Update run for #{@getHostname()}"
       # @runApticronScript()?
+
