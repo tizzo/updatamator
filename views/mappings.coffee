@@ -24,6 +24,7 @@ map.where('id').is('template').use('name').as('id')
 mappings['template'] = map
 
 map = Plates.Map()
+map.where('class').is('update-button update medium button right').use('packageString').as('data-package-string')
 map.where('class').is('server-list').use('serverList')
 map.where('class').is('available-packages').use('available-packages')
 map.class('server-logs').to('server-logs')
