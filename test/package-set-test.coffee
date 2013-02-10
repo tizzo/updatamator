@@ -50,6 +50,7 @@ describe 'PackageSet', ->
         packageSet.getThemableOutput (error, object)->
           assert.equal object.serverList, 'server2.example.com, server3.example.com'
           assert.equal object.packages.length, 1
+          assert.equal object.packageString, '5d6ecbc22a4a3cd29f7cfccb8efbcad36b7808a6'
           done()
     describe '#getLoadedServers()', ->
       it 'should load each of the servers properly', (done)->
