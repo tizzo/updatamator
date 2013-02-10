@@ -1,3 +1,5 @@
+crypto = require 'crypto'
+
 module.exports.Server = class Server
   hostname: ''
   version: ''
@@ -32,7 +34,7 @@ module.exports.Server = class Server
       if next and error
         next error, null
       else if next and not error
-        next false, true
+        next null, true
 
   load: (hostname, next)->
     @hostname = hostname
@@ -70,7 +72,10 @@ module.exports.Server = class Server
   getPackageString: ->
     packageVersions = []
     packageVersions.push "#{packageName}@#{details.version}" for packageName, details of @updates
-    packageVersions.join(':')
+    shasum = crypto.createHash 'sha1'
+    shasum.update packageVersions.join ':'
+    shasum.digest 'hex'
+
 
   setUpdateCommand: (command)->
     @updateCommand = command

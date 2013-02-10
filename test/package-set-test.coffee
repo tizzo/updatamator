@@ -24,7 +24,7 @@ describe 'PackageSet', ->
   it 'should load data properly', (done)->
     packageSet.listSets (error, loadedSets)->
       sets = loadedSets
-      packageSet.load sets[0], (error)->
+      packageSet.load sets[1], (error)->
         done()
   describe 'loaded data methods', ->
     # Perform a fresh load before each
@@ -34,13 +34,13 @@ describe 'PackageSet', ->
         done()
       it 'should have one server in the second package set', (done)->
         packageSet2 = new PackageSet(app)
-        packageSet2.load sets[1], (error)->
+        packageSet2.load sets[0], (error)->
           assert.equal packageSet2.getServers().length, 1, 'One server found in the second package set.'
           done()
-    describe '#listPackages()', ->
-      it 'should list one package', ->
-        assert.equal packageSet.listPackages().length, 1
-        assert.equal packageSet.listPackages().pop(), 'package-one'
+  describe '#listPackages()', ->
+    it 'should list one package', ->
+      assert.equal packageSet.listPackages().length, 1
+      assert.equal packageSet.listPackages().pop(), 'package-one'
     describe '#getReleaseNotes()', ->
       it 'should be a hash containing all of the release notes for each package.', (done)->
         assert.equal packageSet.getReleaseNotes()['package-one'].version, '1.0.2-0ubuntu3.5'
@@ -62,3 +62,4 @@ describe 'PackageSet', ->
         # TODO: run some code here
         packageSet.updateServers()
         done()
+
