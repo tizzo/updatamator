@@ -8,6 +8,7 @@ plates = require 'plates'
 redis = require 'fakeredis'
 coffee = require 'coffee-script'
 
+app.config.set 'testing', true
 
 Winston.loggers.add 'default',
   console:
