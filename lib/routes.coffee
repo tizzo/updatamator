@@ -49,8 +49,6 @@ module.exports.attach = (app)->
       'Content-Type': 'application/json'
     context.res.json message
 
-
-
   # Serve our client side javascript.
   app.router.get 'js/minified.js', ->
     if not app.clientScripts
