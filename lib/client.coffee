@@ -27,7 +27,10 @@ $(document).ready ($)->
     serverLogs = $('.server-logs', logs).hide()
     $('h5.update-logs-title', this).click (event)->
       serverLogs.slideToggle('slow')
-    $('input.update').click (event)->
+    $('input.update', this).click (event)->
+      packageString = $(this).attr('data-package-string')
+      $(this).remove()
+      socket.emit 'runUpdate', packageString
       serverLogs.show()
     $('.server', serverLogs).each ->
       server = this
@@ -36,7 +39,8 @@ $(document).ready ($)->
         $('.log-code', server).slideToggle()
 
   socket = io.connect()
-  # Internal cache for
+  # Internal cache for server log containers so that we do
+  # not query for them repeatedly as logs are streaming in.
   elements = {}
   socket.on 'serverLogMessage', (message)->
     if not elements[message.cssName]

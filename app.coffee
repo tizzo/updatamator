@@ -7,6 +7,7 @@ ecstatic = require 'ecstatic'
 plates = require 'plates'
 redis = require 'redis'
 coffee = require 'coffee-script'
+PackageSet = require('./lib/package-set').PackageSet
 
 app.config.file
   file: path.join __dirname, 'config', 'config.json'
@@ -76,6 +77,12 @@ app.renderTemplates = (templates)->
   output = plates.bind(output, items, app.mappings['template'])
   templates['index'] = index
   return output
+
+app.on 'runUpdate', (packageString)->
+  packageSet = new PackageSet(app)
+  packageSet.load packageString, (error)->
+    if not error
+      packageSet.updateServers()
 
 app.start app.config.get 'port'
 app.log.log 'info', "Application listening on port #{app.config.get 'port'}"

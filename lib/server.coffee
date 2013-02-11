@@ -18,7 +18,7 @@ module.exports.Server = class Server
     else
       console.log 'here'
       Updater = require('./plugins/ssh2RemoteExecutor').Updater
-    @remoteUpdater = new Updater(app, this)
+    @remoteUpdater = new Updater(this, app)
 
   set: (data)->
     if data.hostname
@@ -84,10 +84,7 @@ module.exports.Server = class Server
     shasum.update packageVersions.join ':'
     shasum.digest 'hex'
 
-
-  runUpdates: ->
-    console.log 'run updates'
-    return
+  removeUpdateInformation: ->
     multi = @redisClient.multi()
     multi.srem 'hosts', @getHostname()
     multi.srem @getPackageString(), @getHostname()
@@ -98,4 +95,9 @@ module.exports.Server = class Server
     multi.exec (error, response)->
       console.log "Update run for #{@getHostname()}"
       # @runApticronScript()?
+
+  runUpdates: ->
+    console.log 'server::runUpdates()'
+    @remoteUpdater.runUpdates()
+
 

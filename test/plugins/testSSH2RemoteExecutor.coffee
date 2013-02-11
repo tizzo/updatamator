@@ -4,11 +4,11 @@ module.exports.Updater = class Updater
   constructor: (server, app)->
     @app = app
     @server = server
-  runUpdate: ()->
+  runUpdates: ()->
     log =
-      server: 'server1.example.com'
+      server: @server.getHostname()
       stream: 'stdout'
-      cssName: 'server3-example-com'
+      cssName: @server.getCSSName()
     for num in [0..50]
       log.message = "message #{num}"
-      app.emit 'serverLogMessage', log
+      @app.emit 'serverLogMessage', log

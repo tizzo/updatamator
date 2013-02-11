@@ -23,5 +23,6 @@ module.exports.attach = (app)->
     io.sockets.emit 'serverLogMessage', message
 
   io.sockets.on 'connection', (socket)->
-    # console.log 'connected'
+    socket.on 'runUpdate', (packageString)->
+      app.emit 'runUpdate', packageString
 
