@@ -8,6 +8,7 @@ module.exports.Server = class Server
   app: {}
   redisClient: {}
   remoteUpdater: null
+  packageString: false
 
   constructor: (data, app)->
     @app = app
@@ -51,8 +52,7 @@ module.exports.Server = class Server
     @hostname = hostname
     multi = @redisClient.multi()
     @redisClient.get @getHostname(), (error, packageString)->
-      @packageString = packageString
-      next(error, packageString)
+      next(error, @packageString)
     # multi.sadd @getPackageString(), @getHostname()
     # multi.sadd 'hosts', @getHostname()
     # multi.sadd 'packages', @getPackageString()
@@ -81,11 +81,13 @@ module.exports.Server = class Server
     updates
 
   getPackageString: ->
-    packageVersions = []
-    packageVersions.push "#{packageName}@#{details.version}" for packageName, details of @updates
-    shasum = crypto.createHash 'sha1'
-    shasum.update packageVersions.join ':'
-    shasum.digest 'hex'
+    if not @packageString
+      packageVersions = []
+      packageVersions.push "#{packageName}@#{details.version}" for packageName, details of @updates
+      shasum = crypto.createHash 'sha1'
+      shasum.update packageVersions.join ':'
+      @packageString = shasum.digest 'hex'
+    @packageString
 
   runUpdates: (done)->
     # @app.log.info "Updates started for `#{@getHostname()}`"

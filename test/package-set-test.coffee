@@ -57,7 +57,7 @@ describe 'PackageSet', ->
         packageSet.getLoadedServers (error, servers)->
           assert.equal servers[0].getHostname(), 'server2.example.com'
           assert.equal servers[1].getHostname(), 'server3.example.com'
-        done()
+          done()
     describe '#updateServers()', ->
       it 'should run the update command on each server', (done)->
         # TODO: Tests currently broken, not sure why...
