@@ -11,6 +11,8 @@
   "redisHost": "127.0.0.1",
   "_comment": "Redis port to connect to.",
   "redisPort": 6379,
+  "_comment": "Redis database to connect to.",
+  "redisDatabase": 0,
   "_comment": "Whether we're in testing. A mock redis is used in testing.",
   "testing": false
 }

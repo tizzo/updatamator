@@ -28,6 +28,12 @@ require('./lib/routes').attach app
 
 app.RedisClient = redis.createClient(app.config.get('redisPort'), app.config.get('redisHost'))
 
+# TODO: We probably want to change this to ensure we cannot ever write to
+# the wrong database because we do not wait to see that this is successful.
+# fakeredis does not support `select`
+if not app.config.get 'testing'
+  app.RedisClient.select app.config.get('redisDatabase')
+
 # Load our templates
 app.templates = {}
 for name in fs.readdirSync __dirname + '/views/templates'
