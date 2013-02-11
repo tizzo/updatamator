@@ -19,6 +19,10 @@ module.exports.Server = class Server
       console.log 'here'
       Updater = require('./plugins/ssh2RemoteExecutor').Updater
     @remoteUpdater = new Updater(this, app)
+    self = this
+    serverUpdateComplete = @serverUpdateComplete
+    @app.on "serverUpdateComplete:#{@getHostname()}", (data)->
+      serverUpdateComplete.apply(self, [data])
 
   set: (data)->
     if data.hostname
@@ -84,19 +88,43 @@ module.exports.Server = class Server
     shasum.update packageVersions.join ':'
     shasum.digest 'hex'
 
+  runUpdates: (done)->
+    # @app.log.info "Updates started for `#{@getHostname()}`"
+    # @app.log.info 'foo'
+    @remoteUpdater.runUpdates done
+
   removeUpdateInformation: ->
-    multi = @redisClient.multi()
+    redis = @redisClient
+    packageString = @getPackageString()
+    multi = redis.multi()
     multi.srem 'hosts', @getHostname()
-    multi.srem @getPackageString(), @getHostname()
-    # TODO: Check the total number in the package and remove the string if empty?
-    # multi.srem 'packages', @getPackageString()
-    # TODO: Check the total number in the servers in the string and clear the gc the release notes if empty?
-    # multi.del "#{@getPackageString()}:release-notes", JSON.stringify @getPackageNotes()
+    multi.srem packageString, @getHostname()
+    log = @app.log
+    hostname = @getHostname()
+    hadError = []
+    done = ->
+      if hadError.length > 0
+        log.error "Update complete for #{hostname} but remove from update list failed.", hadError
+      else
+        log.info "Update complete for #{hostname}, removing from update list."
     multi.exec (error, response)->
-      console.log "Update run for #{@getHostname()}"
+      if error
+        hadError.push error
+      # Check to
+      redis.smembers packageString, (error, servers)->
+        if servers.length == 0
+          multi = redis.multi()
+          multi.srem 'packages', packageString
+          multi.del "#{packageString}:release-notes"
+          multi.exec (error, response)->
+            if error
+              hadError.push error
+            done()
+        else
+          done()
+
       # @runApticronScript()?
 
-  runUpdates: ->
-    @remoteUpdater.runUpdates()
-
-
+  serverUpdateComplete: (data)->
+    if data.success
+      @removeUpdateInformation.apply this, arguments

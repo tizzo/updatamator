@@ -60,7 +60,5 @@ describe 'PackageSet', ->
         done()
     describe '#updateServers()', ->
       it 'should run the update command on each server', (done)->
-        # TODO: run some code here
-        packageSet.updateServers()
-        done()
+        packageSet.updateServers done
 

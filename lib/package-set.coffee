@@ -58,10 +58,10 @@ module.exports.PackageSet = class PackageSet
       serverList: @getServers().join ', '
       packages: packages
     next null, json
-  updateServers: ->
+  updateServers: (finished)->
     app = @app
     packageString = @packageString
     @getLoadedServers (error, servers)->
       update = (server, done)-> server.runUpdates done
       async.forEach servers, update, (error)->
-        console.log "Update run on #{packageString}"
+        finished()

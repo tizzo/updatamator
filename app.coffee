@@ -88,7 +88,11 @@ app.on 'runUpdate', (packageString)->
   packageSet = new PackageSet(app)
   packageSet.load packageString, (error)->
     if not error
-      packageSet.updateServers()
+      packageSet.updateServers (error)->
+        if error
+          app.log.error "Package set update failed."
+    else
+      app.log.error "Loading package string #{packageString} failed."
 
 app.start app.config.get 'port'
 app.log.log 'info', "Application listening on port #{app.config.get 'port'}"

@@ -4,7 +4,7 @@ module.exports.Updater = class Updater
   constructor: (server, app)->
     @app = app
     @server = server
-  runUpdates: ()->
+  runUpdates: (done)->
     log =
       server: @server.getHostname()
       stream: 'stdout'
@@ -12,3 +12,5 @@ module.exports.Updater = class Updater
     for num in [0..50]
       log.message = "message #{num}"
       @app.emit 'serverLogMessage', log
+    @app.emit "serverUpdateComplete:#{@server.getHostname()}", {success: true, server: this}
+    done()
