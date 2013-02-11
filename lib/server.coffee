@@ -16,7 +16,6 @@ module.exports.Server = class Server
     if @app.config.get 'testing'
       Updater = require('../test/plugins/testSSH2RemoteExecutor').Updater
     else
-      console.log 'here'
       Updater = require('./plugins/ssh2RemoteExecutor').Updater
     @remoteUpdater = new Updater(this, app)
     self = this

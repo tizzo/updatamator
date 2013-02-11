@@ -2,7 +2,6 @@ app =
   templates: {}
   mappings: {}
 for template, mapping in settings.mappings
-  console.log "#{template}"
   app.mappings[template] = Plates.Map()
   app.mappings[template].mappings = mapping
 
