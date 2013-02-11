@@ -12,7 +12,8 @@
     "socket.io": "0.9.10",
     "coffee-script": "1.4.0",
     "async": "0.1.22",
-    "ssh2": "0.1.13"
+    "ssh2": "0.1.13",
+    "uglify-js": "2.2.4"
   },
   "devDependencies": {
     "api-easy": "0.3.2",

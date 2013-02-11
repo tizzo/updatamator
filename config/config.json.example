@@ -14,5 +14,7 @@
   "_comment": "Redis database to connect to.",
   "redisDatabase": 0,
   "_comment": "Whether we're in testing. A mock redis is used in testing.",
-  "testing": false
+  "testing": false,
+  "_comment": "Whether or not to mangle and minify the javascript.",
+  "minifyjs": true
 }

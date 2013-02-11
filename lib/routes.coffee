@@ -3,7 +3,7 @@ coffee = require 'coffee-script'
 Server = require('./server').Server
 PackageSet = require('../lib/package-set').PackageSet
 async = require 'async'
-
+UglifyJS = require 'uglify-js'
 module.exports.attach = (app)->
   app.router.get '/', ->
     context = this
@@ -67,5 +67,19 @@ module.exports.attach = (app)->
       for name in coffeescripts
         javascript += coffee.compile fs.readFileSync "#{app.dir}/#{name}.coffee", 'utf8'
       app.clientScripts = javascript
+      # Javascript is now a string concatenating all included javascript.
+      # Time to mangle and minify it using uglify.js
+      if app.config.get 'minifyjs'
+        toplevel = UglifyJS.parse javascript
+        toplevel.figure_out_scope()
+        compressor = UglifyJS.Compressor()
+        compressed_ast = toplevel.transform compressor
+        compressed_ast.figure_out_scope()
+        compressed_ast.compute_char_frequency()
+        compressed_ast.mangle_names()
+        stream = UglifyJS.OutputStream()
+        compressed_ast.print(stream)
+        javascript = stream.toString()
+        app.clientScripts = javascript
     app.sendResponse this, 200, app.clientScripts,
       'Content-Type': 'application/javascript'
