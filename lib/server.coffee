@@ -97,7 +97,6 @@ module.exports.Server = class Server
       # @runApticronScript()?
 
   runUpdates: ->
-    console.log 'server::runUpdates()'
     @remoteUpdater.runUpdates()
 
 
