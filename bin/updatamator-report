@@ -24,7 +24,7 @@ DISTRIB_ID="Debian"    # Default to Debian
 [ -e /etc/lsb-release ] && . /etc/lsb-release
 
 # Source the config file
-[ -e /etc/apticron/apticron.conf ] && . /etc/apticron/apticron.conf
+[ -e /etc/updatamator/updatamator.conf ] && . /etc/updatamator/updatamator.conf
 
 # Force resolving and showing all FQDNs
 if [ -n "$ALL_FQDNS" ] ; then
@@ -105,27 +105,28 @@ if [ -n "$PKGNAMES" ] ; then
   /usr/bin/apt-get --ignore-hold -qq -d --allow-unauthenticated --force-yes dist-upgrade > /dev/null
   PKGPATH="/${DIRCACHE}archives/"
   JSON_STRING=''
-  first='true'
+  FIRST='true'
   for PKG in $PKGNAMES ; do
-    if [ "$first" == 'false' ] ; then
+    if [ "$FIRST" == 'false' ] ; then
       JSON_STRING="$JSON_STRING, "
     fi
-    first='false'
+    FIRST='false'
     VER=`LC_ALL=C /usr/bin/apt-cache policy $PKG |\
          /bin/grep Candidate: | /usr/bin/cut -f 4 -d \ `
     VERFILE=`echo "$VER" | /bin/sed -e "s/:/%3a/g"`
-    if ls ${PKGPATH}${PKG}_${VERFILE}_*.deb >& /dev/null ; then
+    if [ -e ${PKGPATH}${PKG}_${VERFILE}_*.deb ] ; then
       DEB="${PKGPATH}${PKG}_${VERFILE}_*.deb"
-      NOTES=`/usr/bin/apt-listchanges --which=both --headers -f text $DEB`
+      NOTES=`/usr/bin/apt-listchanges --which=both --headers -f text "${DEB}"`
     fi
     NOTES=`json_escape "$NOTES"`
     ELEMENT=`printf '"%s": { "version": "%b", "release_notes": %s }' ${PKG} ${VER} "${NOTES}"`
     JSON_STRING="$JSON_STRING $ELEMENT"
   done
+  #echo $JSON_STRING
   ISSUE=`cat /etc/issue`
-  JSON_STRING="{ \"hostname\": \"$SYSTEM\", \"issue\": \"$ISSUE\", \"updates\": { $JSON_STRING } }"
-  echo $JSON_STRING
-
+  ISSUE=`json_escape "$ISSUE"`
+  JSON_STRING="{ \"hostname\": \"$SYSTEM\", \"issue\": $ISSUE, \"secret\": \"$SECRET\", \"updates\": { $JSON_STRING } }"
+  curl -H "Content-Type: application/json"  -d "$JSON_STRING" -X POST --insecure "${REPORT_HOST}/${REPORT_PATH}"
   # TODO: We're not handling the package holds reported by apticron.'
 fi
 
