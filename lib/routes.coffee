@@ -38,16 +38,24 @@ module.exports.attach = (app)->
   handleUpdatePost = ->
     context = this
     data = context.req.body
-    if data.hostname and data.updates
-      response = 201
-      message = 'Updates recorded'
-      server = new Server(data, app)
-      server.save()
-      app.log.info "Update information received from #{server.getHostname()}"
+    if data.secret == app.config.get 'secret'
+      if data.hostname and data.updates
+        response = 201
+        message = 'Updates recorded'
+        server = new Server(data, app)
+        server.save()
+        app.log.info "Update information received from #{server.getHostname()}"
+      else
+        app.log.error "Bad data received", data
+        response = 500
+        message = 'Message parsing failed'
     else
-      app.log.error "Bad data received", data
-      response = 500
-      message = 'Message parsing failed'
+      response = 403
+      message = 'Access denied, bad secret'
+      if data.hostname
+        app.log.error "Bad secret submitted by server reporting to be `#{data.hostname}`"
+      else
+        app.log.error "Bad secret reported."
     context.res.writeHead response,
       'Content-Type': 'application/json'
     context.res.json message
