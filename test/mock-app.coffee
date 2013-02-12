@@ -17,6 +17,13 @@ Winston.loggers.add 'default',
 app.log = Winston.log
 
 app.RedisClient = redis.createClient()
-
+app.use flatiron.plugins.http
+app.start()
 # require('../lib/routes').attach app
 module.exports = app
+
+app.on 'runUpdate', (packageString)->
+  packageSet = new PackageSet(app)
+  packageSet.load packageString, (error)->
+    if not error
+      packageSet.updateServers (error)->
