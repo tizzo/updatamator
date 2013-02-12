@@ -43,6 +43,7 @@ module.exports.attach = (app)->
       server.save()
       app.log.info "Update information received from #{server.getHostname()}"
     else
+      app.log.error "Bad data received", data
       response = 500
       message = 'Message parsing failed'
     context.res.writeHead response,
