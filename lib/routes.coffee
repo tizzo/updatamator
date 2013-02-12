@@ -4,7 +4,9 @@ Server = require('./server').Server
 PackageSet = require('../lib/package-set').PackageSet
 async = require 'async'
 UglifyJS = require 'uglify-js'
+
 module.exports.attach = (app)->
+  console.log "Now listening for incoming update reports on port #{app.config.get('publicPort')}."
   app.router.get '/', ->
     context = this
     packageSet = new PackageSet(app)
