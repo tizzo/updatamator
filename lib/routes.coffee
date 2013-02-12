@@ -33,7 +33,7 @@ module.exports.attach = (app)->
           content: content
         app.sendResponse context, 200, app.renderPage context, data
 
-  app.router.post '/package-updates', ->
+  handleUpdatePost = ->
     context = this
     data = context.req.body
     if data.hostname and data.updates
@@ -48,6 +48,10 @@ module.exports.attach = (app)->
     context.res.writeHead response,
       'Content-Type': 'application/json'
     context.res.json message
+
+  app.router.post '/package-updates', handleUpdatePost
+  app.publicRouter.post '/package-updates', handleUpdatePost
+
 
   # Serve our client side javascript.
   app.router.get 'js/minified.js', ->

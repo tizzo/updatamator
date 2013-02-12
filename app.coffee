@@ -9,6 +9,20 @@ redis = require 'redis'
 coffee = require 'coffee-script'
 PackageSet = require('./lib/package-set').PackageSet
 
+# Setup public webserver on separate port.
+union = require 'union'
+director = require 'director'
+
+app.publicRouter = new director.http.Router()
+server = union.createServer
+  before: [
+    (req, res)->
+      found = app.publicRouter.dispatch req, res
+      if not found
+        res.writeHead 404
+        res.end 'Page not found'
+  ]
+
 app.config.file
   file: path.join __dirname, 'config', 'config.json'
 
@@ -96,4 +110,6 @@ app.on 'runUpdate', (packageString)->
 
 app.start app.config.get 'port'
 app.log.log 'info', "Application listening on port #{app.config.get 'port'}"
+app.log.log 'info', "Application publicly listening for server updates on #{app.config.get 'publicPort'}"
+server.listen app.config.get 'publicPort'
 require('./lib/socket').attach app
