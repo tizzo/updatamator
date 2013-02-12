@@ -15,6 +15,7 @@ director = require 'director'
 
 app.publicRouter = new director.http.Router()
 server = union.createServer
+  buffer: true
   before: [
     (req, res)->
       found = app.publicRouter.dispatch req, res
