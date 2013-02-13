@@ -33,8 +33,9 @@ module.exports.PackageSet = class PackageSet
     @servers
   getLoadedServers: (done)->
     app = @app
+    self = this
     loadServer = (hostname, next)->
-      server = new Server({}, app)
+      server = new Server({packageSet: self}, app)
       server.load hostname, (error)->
         next error, server
     async.map @getServers(), loadServer, (error, servers)->
@@ -64,5 +65,5 @@ module.exports.PackageSet = class PackageSet
     @getLoadedServers (error, servers)->
       update = (server, done)-> server.runUpdates done
       async.forEach servers, update, (error)->
-        console.log "Finished updating #{packageString}"
+        app.log.info "Finished updating #{packageString}"
         finished()

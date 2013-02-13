@@ -10,6 +10,7 @@ module.exports.Server = class Server
   redisClient: {}
   remoteUpdater: null
   packageString: false
+  packageSet: null
 
   constructor: (data, app)->
     _.bindAll this
@@ -17,7 +18,7 @@ module.exports.Server = class Server
     @redisClient = app.RedisClient
     @set(data)
     self = this
-        
+
   set: (data)->
     if data.hostname
       @hostname = data.hostname
@@ -27,6 +28,8 @@ module.exports.Server = class Server
       @updates = data.updates
     if data.issue
       @issue = data.issue
+    if data.packageSet
+      @packageSet = data.packageSet
 
   save: (next = false)->
     multi = @redisClient.multi()
@@ -49,11 +52,19 @@ module.exports.Server = class Server
     self = this
     redis = @redisClient
     redis.get @getHostname(), (error, packageString)->
+      if packageString is null
+        self.app.log.error "Warning package string is null for #{hostname}. Performing cleanup."
+        if self.packageSet
+          cleanupPackageString = self.packageSet.packageString
+          self.removeEmitters()
+          self.removeUpdateInformation cleanupPackageString
+          return next()
+
       # TODO: We may have a bug here...
-      console.log "I believe the packagestring is: #{packageString}"
+      self.app.log.info "I believe the packagestring is: #{packageString}"
       redis.get "#{packageString}:release-notes", (error, updates)->
         self.updates = JSON.parse updates
-        console.log "This is the packagestring: " + self.getPackageString()
+        self.app.log.info "This is the packagestring: " + self.getPackageString()
         next(error, packageString)
 
   getPackageNotes: ->
@@ -90,24 +101,25 @@ module.exports.Server = class Server
     @remoteUpdater = new Updater(this, @app)
     @remoteUpdater.runUpdates done
 
-  removeUpdateInformation: ->
+  removeUpdateInformation: (packageString = null)->
     redis = @redisClient
-    packageString = @getPackageString()
+    if packageString is null
+      packageString = @getPackageString()
     multi = redis.multi()
     multi.srem 'hosts', @getHostname()
     multi.srem packageString, @getHostname()
+    multi.del @getHostname()
     log = @app.log
     hostname = @getHostname()
     hadError = []
     done = ->
       if hadError.length > 0
-        log.error "Update complete for #{hostname} but remove from update list failed.", hadError
+        log.error "Update complete for #{hostname} but removal from update list failed.", hadError
       else
-        log.info "Update complete for #{hostname}, removing from update list."
+        log.info "Update complete for #{hostname}, removed from update list."
     multi.exec (error, response)->
       if error
         hadError.push error
-      # Check to
       redis.smembers packageString, (error, servers)->
         if servers.length == 0
           multi = redis.multi()
@@ -126,4 +138,4 @@ module.exports.Server = class Server
   serverUpdateComplete: (data)->
     if data.success
       @removeEmitters()
-      @removeUpdateInformation data
+      @removeUpdateInformation
