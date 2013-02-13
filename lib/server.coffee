@@ -1,4 +1,5 @@
 crypto = require 'crypto'
+_ = require 'underscore'
 
 module.exports.Server = class Server
   hostname: ''
@@ -11,19 +12,12 @@ module.exports.Server = class Server
   packageString: false
 
   constructor: (data, app)->
+    _.bindAll this
     @app = app
     @redisClient = app.RedisClient
     @set(data)
-    if @app.config.get 'testing'
-      Updater = require('../test/plugins/testSSH2RemoteExecutor').Updater
-    else
-      Updater = require('./plugins/ssh2RemoteExecutor').Updater
-    @remoteUpdater = new Updater(this, app)
     self = this
-    serverUpdateComplete = @serverUpdateComplete
-    @app.on "serverUpdateComplete:#{@getHostname()}", (data)->
-      serverUpdateComplete.apply(self, [data])
-
+        
   set: (data)->
     if data.hostname
       @hostname = data.hostname
@@ -51,17 +45,16 @@ module.exports.Server = class Server
   load: (hostname, next)->
     @hostname = hostname
     multi = @redisClient.multi()
-    @redisClient.get @getHostname(), (error, packageString)->
-      next(error, @packageString)
-    # multi.sadd @getPackageString(), @getHostname()
-    # multi.sadd 'hosts', @getHostname()
-    # multi.sadd 'packages', @getPackageString()
-    # multi.set "#{@getPackageString()}:release-notes", JSON.stringify @getPackageNotes()
-    # multi.exec (error, response) ->
-    #  if next and error
-    #    next error, null
-    #  else if next and not error
-    #    next false, true
+    @app.on "serverUpdateComplete:#{hostname}", @updateCompleteHandler
+    self = this
+    redis = @redisClient
+    redis.get @getHostname(), (error, packageString)->
+      # TODO: We may have a bug here...
+      console.log "I believe the packagestring is: #{packageString}"
+      redis.get "#{packageString}:release-notes", (error, updates)->
+        self.updates = JSON.parse updates
+        console.log "This is the packagestring: " + self.getPackageString()
+        next(error, packageString)
 
   getPackageNotes: ->
     notes = {}
@@ -90,8 +83,11 @@ module.exports.Server = class Server
     @packageString
 
   runUpdates: (done)->
-    # @app.log.info "Updates started for `#{@getHostname()}`"
-    # @app.log.info 'foo'
+    if @app.config.get 'testing'
+      Updater = require('../test/plugins/testSSH2RemoteExecutor').Updater
+    else
+      Updater = require('./plugins/ssh2RemoteExecutor').Updater
+    @remoteUpdater = new Updater(this, @app)
     @remoteUpdater.runUpdates done
 
   removeUpdateInformation: ->
@@ -123,9 +119,11 @@ module.exports.Server = class Server
             done()
         else
           done()
-
-      # @runApticronScript()?
-
+  updateCompleteHandler: (data)->
+    @serverUpdateComplete data
+  removeEmitters: ->
+    @app.removeListener "serverUpdateComplete:#{@getHostname()}", @updateCompleteHandler
   serverUpdateComplete: (data)->
     if data.success
-      @removeUpdateInformation.apply this, arguments
+      @removeEmitters()
+      @removeUpdateInformation data

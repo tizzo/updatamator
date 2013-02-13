@@ -64,4 +64,5 @@ module.exports.PackageSet = class PackageSet
     @getLoadedServers (error, servers)->
       update = (server, done)-> server.runUpdates done
       async.forEach servers, update, (error)->
+        console.log "Finished updating #{packageString}"
         finished()
