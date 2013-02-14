@@ -138,4 +138,4 @@ module.exports.Server = class Server
   serverUpdateComplete: (data)->
     if data.success
       @removeEmitters()
-      @removeUpdateInformation
+      @removeUpdateInformation()
