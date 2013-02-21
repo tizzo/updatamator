@@ -1,5 +1,6 @@
 crypto = require 'crypto'
 _ = require 'underscore'
+moment = require 'moment'
 
 module.exports.Server = class Server
   hostname: ''
@@ -32,18 +33,27 @@ module.exports.Server = class Server
       @packageSet = data.packageSet
 
   save: (next = false)->
-    multi = @redisClient.multi()
-    multi.set @getHostname(), @getPackageString()
-    multi.sadd @getPackageString(), @getHostname()
-    multi.sadd 'hosts', @getHostname()
-    multi.sadd 'issues', @getIssue()
-    multi.sadd 'packages', @getPackageString()
-    multi.set "#{@getPackageString()}:release-notes", JSON.stringify @getPackageNotes()
-    multi.exec (error, response) ->
+    done = (error, response) ->
       if next and error
         next error, null
       else if next and not error
         next null, true
+    multi = @redisClient.multi()
+    time = Math.round new Date().getTime() / 1000
+    multi.zadd ['last-reported', time, @getHostname()]
+    if @getPackages().length is 0
+      console.log "and away we go #{@getHostname()}"
+      multi.zadd ['up-to-date', time, @getHostname()]
+      multi.exec done
+    else
+      multi.zrem 'up-to-date', @getHostname()
+      multi.set @getHostname(), @getPackageString()
+      multi.sadd @getPackageString(), @getHostname()
+      multi.sadd 'hosts', @getHostname()
+      multi.sadd 'issues', @getIssue()
+      multi.sadd 'packages', @getPackageString()
+      multi.set "#{@getPackageString()}:release-notes", JSON.stringify @getPackageNotes()
+      multi.exec done
 
   load: (hostname, next)->
     @hostname = hostname
@@ -83,6 +93,34 @@ module.exports.Server = class Server
     updates = []
     updates.push update for update, notes of @updates
     updates
+
+  getUpToDateServers: (themable, next)->
+    if arguments.length == 1
+      next = arguments[0]
+      themable = null
+    @redisClient.zrevrange 'up-to-date', 0, -1, 'WITHSCORES', (error, results)->
+      items = []
+      for i, item of results
+        if (i % 2) is 0
+          lastUpdatedTime = results[Number(i) + 1]
+          if themable
+            lastUpdatedTime = moment(Number(lastUpdatedTime) * 1000).format('MMMM Do YYYY, h:mm:ss a')
+          items.push { hostname: results[i], lastUpdated: lastUpdatedTime }
+      next error, items
+
+  getReportedServers: (themable, next)->
+    if arguments.length == 1
+      next = arguments[0]
+      themable = null
+    @redisClient.zrevrange 'last-reported', 0, -1, 'WITHSCORES', (error, results)->
+      items = []
+      for i, item of results
+        if (i % 2) is 0
+          lastUpdatedTime = results[Number(i) + 1]
+          if themable
+            lastUpdatedTime = moment(Number(lastUpdatedTime) * 1000).format('MMMM Do YYYY, h:mm:ss a')
+          items.push { hostname: results[i], lastUpdated: lastUpdatedTime }
+      next error, items
 
   getPackageString: ->
     if not @packageString

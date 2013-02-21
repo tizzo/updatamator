@@ -46,3 +46,8 @@ map = Plates.Map()
 map.class('message').use('message')
 map.class('stdout').use('stream').as('class')
 mappings['server-logs-message'] = map
+
+map = Plates.Map()
+map.class('hostname').to('hostname')
+map.class('date').to('lastUpdated')
+mappings['checked-in-row'] = map

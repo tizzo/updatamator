@@ -33,10 +33,16 @@ module.exports.attach = (app)->
           availableUpdates = app.renderTemplate 'available-package-sets', 'available-package-sets': availablePackageSets
         else
           availableUpdates = app.renderTemplate 'all-servers-up-to-date'
-        data =
-          'available-updates': availableUpdates
-          'currently-up-to-date': app.renderTemplate 'currently-up-to-date'
-        app.sendResponse context, 200, app.renderPage context, data
+        upToDateServers = new Server({}, app).getReportedServers true, (error, servers)->
+          if servers.length > 0
+            checkedInRows = app.renderTemplate 'checked-in-row', servers
+            checkedInMarkup = app.renderTemplate('checked-in', { 'checked-in-body': checkedInRows })
+          else
+            checkedInMarkup = app.renderTemplate 'no-servers-reported'
+          data =
+            'available-updates': availableUpdates
+            'checked-in': checkedInMarkup
+          app.sendResponse context, 200, app.renderPage context, data
 
   handleUpdatePost = ->
     context = this
