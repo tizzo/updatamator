@@ -44,7 +44,11 @@ $(document).ready ($)->
   socket.on 'serverLogMessage', (message)->
     if not elements[message.cssName]
       elements[message.cssName] = $(".server##{message.cssName}-logs .log-contents")
-    elements[message.cssName].append Plates.bind app.templates['server-logs-message'], message, window.mappings['server-logs-message']
+    elements[message.cssName].append(Plates.bind app.templates['server-logs-message'], message, window.mappings['server-logs-message'])
+      # Scroll to the very bottom every time a message comes in.
+      # TODO: It would be nice to do this dynamically but the async nature here means we often
+      # under report the current height as we try to update.
+      .scrollTop(9999999999)
 
 root = exports ? this
 root.app = app
