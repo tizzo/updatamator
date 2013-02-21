@@ -1,11 +1,13 @@
 Connection = require 'ssh2'
 fs = require 'fs'
+_ = require 'underscore'
 
 module.exports.Updater = class Updater
   app: null
   server: null
   conf: {}
   constructor: (server, app)->
+    _.bindAll this
     @app = app
     @server = server
     @conf =
@@ -21,21 +23,38 @@ module.exports.Updater = class Updater
       server: @server.getHostname()
       stream: extended
       cssName: @server.getCSSName()
-      message: data
+      message: data.toString()
   logMessage: (data, extended)->
-    @app.emit 'serverLogMessage', @createLogMessage()
+    @app.emit 'serverLogMessage', @createLogMessage(data, extended)
   runUpdates: (done)->
     sshConnection = new Connection()
-    that = this
+    self = this
+    logError = @app.log.error
+    logInfo = @app.log.error
+    sshLocation = @getSSHLocation()
     sshConnection.on 'ready', ->
-      sshConnection.exec @app.config.get 'defaultUpdateCommand', (error, stream)->
+      sshConnection.exec self.app.config.get('defaultUpdateCommand'), (error, stream)->
+        self.app.log.info "Connected to #{sshLocation}"
         if error
-          that.app.log.error "Error connecting to #{that.getSSHLocation()}, updates could not be run."
+          self.app.log.error "Error connecting to #{sshLocation}, updates could not be run."
           done error
+          return
         stream.on 'data', (data, extended)->
-          that.app.log.log (extended === 'stderr' ? 'error' : 'info'), data
-          that.logMessage.apply that, [data, extended]
+          self.logMessage.apply self, [data, extended]
         stream.on 'exit', (code, signal)->
-          if code is 0
-            done null
+          if code.toString() == '0'
+            self.app.log.info "Terminating connection with #{sshLocation}"
+            sshConnection.end()
+            console.log "Emitting serverUpdateComplete:#{self.server.getHostname()}"
+            self.app.emit "serverUpdateComplete:#{self.server.getHostname()}", {success: true, server: this}
+            done()
+          else
+            self.app.log.info "Terminating connection with #{sshLocation}"
+            self.app.log.error "Update command on #{sshLocation} failed.", arguments
+            console.log arguments
+            sshConnection.end()
+            done new Error 'Something went wrong with SSH'
+    sshConnection.on 'error', (error)->
+      logError "Connecting to #{sshLocation} failed."
+    self.app.log.info "Connecting to #{sshLocation}"
     sshConnection.connect @conf

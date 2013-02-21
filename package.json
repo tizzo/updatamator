@@ -15,7 +15,8 @@
     "ssh2": "0.1.13",
     "uglify-js": "2.2.4",
     "director": "1.1.10",
-    "union": "0.1.7"
+    "union": "0.1.7",
+    "underscore": "1.4.4"
   },
   "devDependencies": {
     "api-easy": "0.3.2",
