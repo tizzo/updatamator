@@ -16,7 +16,8 @@
     "uglify-js": "2.2.4",
     "director": "1.1.10",
     "union": "0.1.7",
-    "underscore": "1.4.4"
+    "underscore": "1.4.4",
+    "moment": "2.0.0"
   },
   "devDependencies": {
     "api-easy": "0.3.2",
