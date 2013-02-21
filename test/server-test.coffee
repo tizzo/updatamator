@@ -26,9 +26,10 @@ describe 'Server', ->
   describe '#save()', ->
     it 'should persist the server and package information to redis', (done)->
       server.save done
-    it 'should retrieve the correct package list', ->
+    it 'should retrieve the correct package list', (done)->
       redisClient.get 'server1.example.com', (error, data)->
         assert.equal 40, data.length
+        done()
     it 'should find the hostname is in package list', (done)->
       redisClient.sismember server.getPackageString(), 'server1.example.com', (error, data)->
         assert.equal data, true
