@@ -45,14 +45,14 @@ module.exports.Updater = class Updater
           if code.toString() == '0'
             self.app.log.info "Terminating connection with #{sshLocation}"
             sshConnection.end()
-            console.log "Emitting serverUpdateComplete:#{self.server.getHostname()}"
-            self.app.emit "serverUpdateComplete:#{self.server.getHostname()}", {success: true, server: this}
+            console.log "Emitting serverUpdateComplete::#{self.server.getHostname()}"
+            self.app.emit "serverUpdateComplete::#{self.server.getHostname()}", {success: true, server: self.server}
             done()
           else
             self.app.log.info "Terminating connection with #{sshLocation}"
             self.app.log.error "Update command on #{sshLocation} failed.", arguments
-            console.log arguments
             sshConnection.end()
+            self.app.emit "serverUpdateComplete::#{self.server.getHostname()}", {success: false, server: self.server}
             done new Error 'Something went wrong with SSH'
     sshConnection.on 'error', (error)->
       logError "Connecting to #{sshLocation} failed."
