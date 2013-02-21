@@ -23,16 +23,20 @@ module.exports.attach = (app)->
         if error
           app.log.error 'Error loading packages for display', error
           return
-        for i, packageSet of packageSets
-          packageSets[i]['available-packages'] = app.renderTemplate 'package-detail', packageSet.packages
-          servers = packageSet.packageSet.getServers()
-          # TODO: this server.replace is duplicated from Server::getCSSName(), perhaps we should us that code somehow?
-          servers = ({'server-name': server, 'css-name': "#{server.replace(/\./g, '-')}-logs"} for server in servers)
-          packageSets[i]['server-logs'] = app.renderTemplate 'server-logs', servers
-        availablePackageSets = app.renderTemplate 'available-package-set', packageSets
-        content = app.renderTemplate 'available-package-sets', 'available-package-sets': availablePackageSets
+        if packageSets.length > 0
+          for i, packageSet of packageSets
+            packageSets[i]['available-packages'] = app.renderTemplate 'package-detail', packageSet.packages
+            servers = packageSet.packageSet.getServers()
+            # TODO: this server.replace is duplicated from Server::getCSSName(), perhaps we should us that code somehow?
+            servers = ({'server-name': server, 'css-name': "#{server.replace(/\./g, '-')}-logs"} for server in servers)
+            packageSets[i]['server-logs'] = app.renderTemplate 'server-logs', servers
+          availablePackageSets = app.renderTemplate 'available-package-set', packageSets
+          availableUpdates = app.renderTemplate 'available-package-sets', 'available-package-sets': availablePackageSets
+        else
+          availableUpdates = app.renderTemplate 'all-servers-up-to-date'
         data =
-          content: content
+          'available-updates': availableUpdates
+          'currently-up-to-date': app.renderTemplate 'currently-up-to-date'
         app.sendResponse context, 200, app.renderPage context, data
 
   handleUpdatePost = ->
