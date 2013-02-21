@@ -99,12 +99,13 @@ function json_escape(){
   echo -n "$1" | python -c 'import json,sys; print json.dumps(sys.stdin.read())'
 }
 
+JSON_STRING=''
+
 if [ -n "$PKGNAMES" ] ; then
 
   # do the upgrade downloads
   /usr/bin/apt-get --ignore-hold -qq -d --allow-unauthenticated --force-yes dist-upgrade > /dev/null
   PKGPATH="/${DIRCACHE}archives/"
-  JSON_STRING=''
   FIRST='true'
   for PKG in $PKGNAMES ; do
     if [ "$FIRST" == 'false' ] ; then
@@ -122,13 +123,12 @@ if [ -n "$PKGNAMES" ] ; then
     ELEMENT=`printf '"%s": { "version": "%b", "release_notes": %s }' ${PKG} ${VER} "${NOTES}"`
     JSON_STRING="$JSON_STRING $ELEMENT"
   done
-  #echo $JSON_STRING
-  ISSUE=`cat /etc/issue`
-  ISSUE=`json_escape "$ISSUE"`
-  JSON_STRING="{ \"hostname\": \"$SYSTEM\", \"issue\": $ISSUE, \"secret\": \"$SECRET\", \"updates\": { $JSON_STRING } }"
-  curl -H "Content-Type: application/json"  -d "$JSON_STRING" -X POST --insecure "${REPORT_HOST}/${REPORT_PATH}"
   # TODO: We're not handling the package holds reported by apticron.'
 fi
 
+ISSUE=`cat /etc/issue`
+ISSUE=`json_escape "$ISSUE"`
+JSON_STRING="{ \"hostname\": \"$SYSTEM\", \"issue\": $ISSUE, \"secret\": \"$SECRET\", \"updates\": { $JSON_STRING } }"
+curl -H "Content-Type: application/json"  -d "$JSON_STRING" -X POST --insecure "${REPORT_HOST}/${REPORT_PATH}"
 
 exit 0
