@@ -22,6 +22,13 @@ module.exports.attach = (app)->
   app.on 'serverLogMessage', (message)->
     io.sockets.emit 'serverLogMessage', message
 
+  app.on 'serverUpdateComplete::*', (data)->
+    server = data.server
+    io.sockets.emit 'serverUpdateComplete',
+      cssName: server.getCSSName()
+      serverHostName: server.getHostname()
+
+
   io.sockets.on 'connection', (socket)->
     socket.on 'runUpdate', (packageString)->
       app.emit 'runUpdate', packageString

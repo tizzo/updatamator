@@ -48,7 +48,7 @@ module.exports.Server = class Server
   load: (hostname, next)->
     @hostname = hostname
     multi = @redisClient.multi()
-    @app.on "serverUpdateComplete:#{hostname}", @updateCompleteHandler
+    @app.on "serverUpdateComplete::#{hostname}", @updateCompleteHandler
     self = this
     redis = @redisClient
     redis.get @getHostname(), (error, packageString)->
@@ -134,7 +134,7 @@ module.exports.Server = class Server
   updateCompleteHandler: (data)->
     @serverUpdateComplete data
   removeEmitters: ->
-    @app.removeListener "serverUpdateComplete:#{@getHostname()}", @updateCompleteHandler
+    @app.removeListener "serverUpdateComplete::#{@getHostname()}", @updateCompleteHandler
   serverUpdateComplete: (data)->
     if data.success
       @removeEmitters()
