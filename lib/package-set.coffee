@@ -54,6 +54,7 @@ module.exports.PackageSet = class PackageSet
       item.title = title
       packages.push item
     json =
+      packageCount: packages.length
       packageString: @packageString
       serverList: @getServers().join ', '
       packages: packages

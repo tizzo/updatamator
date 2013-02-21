@@ -28,6 +28,7 @@ map.where('class').is('update-button update medium button right').use('packageSt
 map.where('class').is('server-list').use('serverList')
 map.where('class').is('available-packages').use('available-packages')
 map.class('server-logs').to('server-logs')
+map.class('count-value').to('packageCount')
 mappings['available-package-set'] = map
 
 map = Plates.Map()
