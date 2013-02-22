@@ -70,11 +70,8 @@ module.exports.Server = class Server
           self.removeUpdateInformation cleanupPackageString
           return next()
 
-      # TODO: We may have a bug here...
-      self.app.log.info "I believe the packagestring is: #{packageString}"
       redis.get "#{packageString}:release-notes", (error, updates)->
         self.updates = JSON.parse updates
-        self.app.log.info "This is the packagestring: " + self.getPackageString()
         next(error, packageString)
 
   getPackageNotes: ->
