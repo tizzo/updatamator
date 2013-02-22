@@ -28,8 +28,15 @@ module.exports.attach = (app)->
       cssName: server.getCSSName()
       serverHostName: server.getHostname()
 
+  app.on 'monitoringRemoved', (server)->
+    io.sockets.emit 'monitoringRemoved',
+      cssName: server.getCSSName()
+      serverHostName: server.getHostname()
+
 
   io.sockets.on 'connection', (socket)->
     socket.on 'runUpdate', (packageString)->
       app.emit 'runUpdate', packageString
+    socket.on 'removeMonitoring', (hostname)->
+      app.emit 'removeMonitoring', hostname
 

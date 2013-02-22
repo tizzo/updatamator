@@ -48,6 +48,8 @@ map.class('stdout').use('stream').as('class')
 mappings['server-logs-message'] = map
 
 map = Plates.Map()
+map.class('checked-in-row').use('cssName').as('id')
 map.class('hostname').to('hostname')
 map.class('date').to('lastUpdated')
+map.class('delete button tiny alert').use('hostname').as('data-hostname')
 mappings['checked-in-row'] = map

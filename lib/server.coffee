@@ -55,6 +55,13 @@ module.exports.Server = class Server
       multi.set "#{@getPackageString()}:release-notes", JSON.stringify @getPackageNotes()
       multi.exec done
 
+  removeMonitoring: (next)->
+    multi = @redisClient.multi()
+    multi.zrem 'up-to-date', @getHostname()
+    multi.zrem 'last-reported', @getHostname()
+    multi.exec next
+
+
   load: (hostname, next)->
     @hostname = hostname
     multi = @redisClient.multi()
@@ -81,8 +88,10 @@ module.exports.Server = class Server
 
   getHostname: -> @hostname
 
-  getCSSName: ->
-    @getHostname().replace(/\./g, '-')
+  getCSSName: (hostname)->
+    if not hostname
+      hostname = @getHostname()
+    hostname.replace(/\./g, '-')
 
   getIssue: -> @issue
 
@@ -106,6 +115,7 @@ module.exports.Server = class Server
       next error, items
 
   getReportedServers: (themable, next)->
+    self = this
     if arguments.length == 1
       next = arguments[0]
       themable = null
@@ -116,7 +126,8 @@ module.exports.Server = class Server
           lastUpdatedTime = results[Number(i) + 1]
           if themable
             lastUpdatedTime = moment(Number(lastUpdatedTime) * 1000).format('MMMM Do YYYY, h:mm:ss a')
-          items.push { hostname: results[i], lastUpdated: lastUpdatedTime }
+            hostname = results[i]
+          items.push { hostname: hostname, lastUpdated: lastUpdatedTime, cssName: self.getCSSName(hostname)}
       next error, items
 
   getPackageString: ->

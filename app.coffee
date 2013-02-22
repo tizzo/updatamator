@@ -8,6 +8,7 @@ plates = require 'plates'
 redis = require 'redis'
 coffee = require 'coffee-script'
 PackageSet = require('./lib/package-set').PackageSet
+Server = require('./lib/server').Server
 
 # Setup public webserver on separate port.
 union = require 'union'
@@ -99,6 +100,7 @@ app.renderTemplates = (templates)->
   templates['index'] = index
   return output
 
+# TODO: This is the only section with business logic in this file. PLZ FIX
 app.on 'runUpdate', (packageString)->
   packageSet = new PackageSet(app)
   packageSet.load packageString, (error)->
@@ -108,6 +110,18 @@ app.on 'runUpdate', (packageString)->
           app.log.error "Package set update failed."
     else
       app.log.error "Loading package string #{packageString} failed."
+
+# TODO: This is the only section with business logic in this file. PLZ FIX
+app.on 'removeMonitoring', (hostname)->
+  server = new Server {}, app
+  server.load hostname, (error)->
+    if error
+      app.log.error 'Loading server to remove monitoring encountered an error.', error
+    else
+      server.removeMonitoring (error)->
+        if not error
+          app.emit 'monitoringRemoved', server
+
 
 app.start app.config.get 'port'
 app.log.log 'info', "Application listening on port #{app.config.get 'port'}"

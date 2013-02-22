@@ -33,7 +33,7 @@ module.exports.attach = (app)->
           availableUpdates = app.renderTemplate 'available-package-sets', 'available-package-sets': availablePackageSets
         else
           availableUpdates = app.renderTemplate 'all-servers-up-to-date'
-        upToDateServers = new Server({}, app).getReportedServers true, (error, servers)->
+        new Server({}, app).getReportedServers true, (error, servers)->
           if servers.length > 0
             checkedInRows = app.renderTemplate 'checked-in-row', servers
             checkedInMarkup = app.renderTemplate('checked-in', { 'checked-in-body': checkedInRows })

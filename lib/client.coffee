@@ -6,12 +6,22 @@ for template, mapping in settings.mappings
   app.mappings[template].mappings = mapping
 
 $(document).ready ($)->
+
+  socket = io.connect()
+
   # Load our templates into memory for client side rendering.
   $('#templates script').each -> app.templates[$(this).attr 'id'] = $(this).text()
   $('#templates').remove()
 
   # Activate Foudnation accordion.
   $('#page ul.accordion').foundationAccordion()
+
+  $('button.delete').click ->
+    button = $ this
+    row = button.closest('tr')
+    socket.emit 'removeMonitoring', button.attr 'data-hostname'
+  socket.on 'monitoringRemoved', (data)->
+    $('#checked-in #' + data.cssName).remove()
 
   # Setup each package set.
   $('li.available-package-set').each ()->
@@ -37,7 +47,6 @@ $(document).ready ($)->
         console.log 'toggle'
         $('.log-code', server).slideToggle()
 
-  socket = io.connect()
   # Internal cache for server log containers so that we do
   # not query for them repeatedly as logs are streaming in.
   elements = {}
