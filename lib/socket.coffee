@@ -40,4 +40,5 @@ module.exports.attach = (app)->
       app.emit 'runUpdate', packageString
     socket.on 'removeMonitoring', (hostname)->
       app.emit 'removeMonitoring', hostname
-
+    socket.on 'runCommand', (data)->
+      app.emit 'runCommand', data

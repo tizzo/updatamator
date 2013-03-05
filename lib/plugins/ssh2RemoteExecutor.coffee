@@ -6,6 +6,7 @@ module.exports.Updater = class Updater
   app: null
   server: null
   conf: {}
+  runCommandListeners: []
   constructor: (server, app)->
     _.bindAll this
     @app = app
@@ -26,6 +27,9 @@ module.exports.Updater = class Updater
       message: data.toString()
   logMessage: (data, extended)->
     @app.emit 'serverLogMessage', @createLogMessage(data, extended)
+  removeListeners: ->
+    for listener in @runCommandListeners
+      @app.removeListener "runCommand", listener
   runUpdates: (done)->
     sshConnection = new Connection()
     self = this
@@ -41,7 +45,12 @@ module.exports.Updater = class Updater
           return
         stream.on 'data', (data, extended)->
           self.logMessage.apply self, [data, extended]
+        listener = (data)->
+          stream.write(data.command + "\n\r")
+        self.app.on 'runCommand', listener
+        self.runCommandListeners.push listener
         stream.on 'exit', (code, signal)->
+          self.removeListeners()
           if code.toString() == '0'
             self.app.log.info "Terminating connection with #{sshLocation}"
             sshConnection.end()
@@ -55,6 +64,7 @@ module.exports.Updater = class Updater
             self.app.emit "serverUpdateComplete::#{self.server.getHostname()}", {success: false, server: self.server}
             done new Error 'Something went wrong with SSH'
     sshConnection.on 'error', (error)->
+      self.removeListeners()
       logError "Connecting to #{sshLocation} failed."
     self.app.log.info "Connecting to #{sshLocation}"
     sshConnection.connect @conf

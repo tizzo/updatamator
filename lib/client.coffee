@@ -34,6 +34,14 @@ $(document).ready ($)->
 
     logs = $('.update-logs', this)
     serverLogs = $('.server-logs', logs).hide()
+    commandRunner = $('.command-runner', logs).hide()
+    $('input.run').click (event)->
+      event.preventDefault()
+      event.stopPropagation()
+      data =
+        command: $('.all-servers-command', commandRunner).val()
+      socket.emit 'runCommand',data
+      return false
     $('h5.update-logs-title', this).click (event)->
       serverLogs.slideToggle('slow')
     $('input.update', this).click (event)->
@@ -41,6 +49,7 @@ $(document).ready ($)->
       $(this).remove()
       socket.emit 'runUpdate', packageString
       serverLogs.show()
+      commandRunner.show()
     $('.server', serverLogs).each ->
       server = this
       $('h6.server-name', server).click ->

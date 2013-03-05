@@ -179,6 +179,7 @@ module.exports.Server = class Server
           done()
   updateCompleteHandler: (data)->
     @serverUpdateComplete data
+  # TODO: rename this `removeListeners`
   removeEmitters: ->
     @app.removeListener "serverUpdateComplete::#{@getHostname()}", @updateCompleteHandler
   serverUpdateComplete: (data)->
