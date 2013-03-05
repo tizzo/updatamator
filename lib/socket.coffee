@@ -27,6 +27,7 @@ module.exports.attach = (app)->
     io.sockets.emit 'serverUpdateComplete',
       cssName: server.getCSSName()
       serverHostName: server.getHostname()
+      success: data.success
 
   app.on 'monitoringRemoved', (server)->
     io.sockets.emit 'monitoringRemoved',

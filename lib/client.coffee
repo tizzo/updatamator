@@ -59,7 +59,8 @@ $(document).ready ($)->
       # under report the current height as we try to update.
       .scrollTop(9999999999)
   socket.on 'serverUpdateComplete', (message)->
-    $(".server##{message.cssName}-logs h6").after Plates.bind app.templates['update-successful']
+    updateTemplate = if message.success then 'update-successful' else 'update-failed'
+    $(".server##{message.cssName}-logs h6").after Plates.bind app.templates[updateTemplate]
 
 root = exports ? this
 root.app = app
