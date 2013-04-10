@@ -26,10 +26,10 @@
     "fakeredis": "0.0.14"
   },
   "scripts": {
-    "test": "vows --spec",
+    "test": "node_modules/.bin/mocha --compilers coffee:coffee-script",
     "start": "node app.js"
   },
-  "name": "updatr",
+  "name": "updatamator",
   "author": "Howard Tyson",
   "homepage": ""
 }
