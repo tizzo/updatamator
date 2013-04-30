@@ -27,9 +27,9 @@
   },
   "scripts": {
     "test": "node_modules/.bin/mocha --compilers coffee:coffee-script",
-    "start": "node app.js"
+    "start": "coffee app.coffee"
   },
   "name": "updatamator",
   "author": "Howard Tyson",
-  "homepage": ""
+  "homepage": "https://github.com/tizzo/updatamator"
 }
