@@ -40,9 +40,7 @@ CSS is generated using SASS which leverages zurb foundation. Modify the CSS by w
 
 Unit testing is done with mocha and integration/frontend testing will be done with casper.js.
 
-You may run the unit tests with the following code (and may add `-w test` if you want the tests to watch a directory and rerun themselves on file change:
-
-  npm test
+You may run the unit tests with `npm test` or you can run `./node_modules/.bin/mocha --compilers coffee:coffee-script` if you want to specify more options (particularly useful is `-w test` if you want the tests to watch the test directory and rerun themselves on file change).
 
 If you want to simulate a report coming in on a test instance you can do that by sending some of the example JSON used for testing with CURL using a command like the following:
 
