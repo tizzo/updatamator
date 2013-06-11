@@ -46,7 +46,7 @@ module.exports.Server = class Server
       oldPackageString = oldServerData.getPackageString()
       if oldPackageString != self.getPackageString()
         redis.smembers oldPackageString, (error, hosts)->
-          multi = c.multi()
+          multi = redis.multi()
           if hosts.length == 0
             multi.del oldPackageString
             multi.del "#{oldPackageString}:release-notes"
