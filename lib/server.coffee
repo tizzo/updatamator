@@ -43,15 +43,15 @@ module.exports.Server = class Server
     redis = @redisClient
     self = this
     oldServerData.load @hostname, ->
-      if oldServerData.getPackageString() != self.getPackageString()
-        multi.srem oldServerData.getPackageString(), oldServerData.getHostname()
-        redis.smembers oldServerData.getPackageString(), (error, data)-> 
-        # TODO: Do some cleanup here?
-        # multi.srem 'issues', oldServerData.getIssue()
-        # multi.srem 'packages', oldServerData.getPackageString()
-        multi.exec()
-      else
-        console.log 'lookin good!' + oldServerData.getPackageString()
+      oldPackageString = oldServerData.getPackageString()
+      if oldPackageString != self.getPackageString()
+        redis.smembers oldPackageString, (error, hosts)->
+          multi = c.multi()
+          if hosts.length == 0
+            multi.del oldPackageString
+            multi.del "#{oldPackageString}:release-notes"
+            multi.srem 'packages', oldPackageString
+            multi.exec()
     time = Math.round new Date().getTime() / 1000
     multi.zadd ['last-reported', time, @getHostname()]
     if @getPackages().length is 0
