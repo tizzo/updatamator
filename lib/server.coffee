@@ -89,6 +89,8 @@ module.exports.Server = class Server
           self.removeEmitters()
           self.removeUpdateInformation cleanupPackageString
           return next()
+        else
+          self.packageString = packageString
 
       redis.get "#{packageString}:release-notes", (error, updates)->
         self.updates = JSON.parse updates
