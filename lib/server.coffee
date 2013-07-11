@@ -42,7 +42,7 @@ module.exports.Server = class Server
     multi = @redisClient.multi()
     redis = @redisClient
     self = this
-    oldServerData.load @hostname, ->
+    oldServerData.load @hostname, (error, packageString)->
       oldPackageString = oldServerData.getPackageString()
       if oldPackageString != self.getPackageString()
         redis.smembers oldPackageString, (error, hosts)->
@@ -83,7 +83,8 @@ module.exports.Server = class Server
     redis = @redisClient
     redis.get @getHostname(), (error, packageString)->
       if packageString is null
-        self.app.log.error "Warning package string is null for #{hostname}. Performing cleanup."
+        # TODO: FIXME
+        # self.app.log.error "Warning package string is null for #{hostname}. Performing cleanup."
         if self.packageSet
           cleanupPackageString = self.packageSet.packageString
           self.removeEmitters()
