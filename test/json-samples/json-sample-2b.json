@@ -1,0 +1,15 @@
+{
+  "hostname": "server2.example.com",
+  "issue": "Ubuntu 12.01 LTS",
+  "secret": "",
+  "updates": {
+    "package-one": {
+      "version": "1.0.2-0ubuntu3.5",
+      "release_notes": "Release notes for package one."
+    },
+	"package-three": {
+      "version": "2.0.1-0ubuntu3.7",
+      "release_notes": "Release notes for package three."
+    }
+  }
+}
