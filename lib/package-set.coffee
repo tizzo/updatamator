@@ -20,7 +20,7 @@ module.exports.PackageSet = class PackageSet
     @packageString = packageString
     multi = @redisClient.multi()
     multi.smembers packageString
-    multi.get "#{@packageString}:release-notes"
+    multi.get "package-set:#{@packageString}:release-notes"
     that = this
     multi.exec (error, data)->
       if error

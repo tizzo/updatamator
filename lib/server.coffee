@@ -49,7 +49,7 @@ module.exports.Server = class Server
           multi = redis.multi()
           if hosts.length == 0
             multi.del oldPackageString
-            multi.del "#{oldPackageString}:release-notes"
+            multi.del "package-set:#{oldPackageString}:release-notes"
             multi.srem 'packages', oldPackageString
             multi.exec()
     time = Math.round new Date().getTime() / 1000
@@ -65,7 +65,7 @@ module.exports.Server = class Server
       multi.sadd 'hosts', @getHostname()
       multi.sadd 'issues', @getIssue()
       multi.sadd 'packages', @getPackageString()
-      multi.set "#{@getPackageString()}:release-notes", JSON.stringify @getPackageNotes()
+      multi.set "package-set:#{@getPackageString()}:release-notes", JSON.stringify @getPackageNotes()
       multi.exec done
 
   removeMonitoring: (next)->
@@ -92,7 +92,7 @@ module.exports.Server = class Server
         else
           self.packageString = packageString
 
-      redis.get "#{packageString}:release-notes", (error, updates)->
+      redis.get "package-set:#{packageString}:release-notes", (error, updates)->
         self.updates = JSON.parse updates
         next(error, packageString)
 
@@ -185,7 +185,7 @@ module.exports.Server = class Server
         if servers.length == 0
           multi = redis.multi()
           multi.srem 'packages', packageString
-          multi.del "#{packageString}:release-notes"
+          multi.del "#package-set:{packageString}:release-notes"
           multi.exec (error, response)->
             if error
               hadError.push error
