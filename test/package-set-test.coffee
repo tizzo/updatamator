@@ -5,22 +5,21 @@ app = require './mock-app'
 Server = require('../lib/server').Server
 
 redisClient = app.RedisClient
-
-# TODO: Isn't there some way to pass variables forward in tests?
-# it 'should accept data as the constructor', ->
-data = require('./json-samples/json-sample-1')
-packageSet = new PackageSet(app)
-
-new Server(require('./json-samples/json-sample-2'), app).save()
-new Server(require('./json-samples/json-sample-3'), app).save()
-new Server(require('./json-samples/json-sample-4'), app).save()
+packageSet = null
 
 describe 'PackageSet', ->
+  before ->
+    redisClient.flushdb()
+    packageSet = new PackageSet(app)
+    new Server(require('./json-samples/json-sample-2'), app).save()
+    new Server(require('./json-samples/json-sample-3'), app).save()
+    new Server(require('./json-samples/json-sample-4'), app).save()
   sets = []
   describe '#listSets()', ->
-    it 'should find two package sets', ->
+    it 'should find two package sets', (done)->
       packageSet.listSets (error, sets)->
         assert.equal sets.length, 2, 'Two package sets found'
+        done()
   it 'should load data properly', (done)->
     packageSet.listSets (error, loadedSets)->
       sets = loadedSets
