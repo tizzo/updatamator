@@ -22,6 +22,7 @@ app.start()
 # require('../lib/routes').attach app
 module.exports = app
 
+# TODO: This should be an an app class that is used on tests and main process.
 app.on 'runUpdate', (packageString)->
   packageSet = new PackageSet(app)
   packageSet.load packageString, (error)->
