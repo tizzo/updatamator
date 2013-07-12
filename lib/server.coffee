@@ -42,16 +42,16 @@ module.exports.Server = class Server
     multi = @redisClient.multi()
     redis = @redisClient
     self = this
-    oldServerData.load @hostname, (error, packageString)->
-      oldPackageString = oldServerData.getPackageString()
-      if oldPackageString != self.getPackageString()
+    oldServerData.load @hostname, (error, oldPackageString)->
+      if oldPackageString != null and oldPackageString != self.getPackageString()
         redis.smembers oldPackageString, (error, hosts)->
           multi = redis.multi()
           if hosts.length == 0
             multi.del oldPackageString
             multi.del "package-set:#{oldPackageString}:release-notes"
             multi.srem 'packages', oldPackageString
-            multi.exec()
+          multi.srem oldPackageString, self.getHostname()
+          multi.exec()
     time = Math.round new Date().getTime() / 1000
     multi.zadd ['last-reported', time, @getHostname()]
     if @getPackages().length is 0
