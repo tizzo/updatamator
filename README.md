@@ -1,4 +1,5 @@
 # Updatamator
+[![Build Status](https://travis-ci.org/tizzo/updatamator.png?branch=master)](https://travis-ci.org/tizzo/updatamator)
 
 Updatamator automates keeping track of available packages updates across your set of servers and issuing commands to update them via the appropriate package manager on a given system.
 
